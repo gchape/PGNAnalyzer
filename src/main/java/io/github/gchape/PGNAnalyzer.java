@@ -16,6 +16,7 @@ public class PGNAnalyzer extends Application {
     public void start(Stage stage) {
         Scene scene = new Scene(Controller.root(), 600, 500);
         scene.getStylesheets().add(Objects.requireNonNull(this.getClass().getResource("/styles.css")).toExternalForm());
+        stage.setResizable(false);
         stage.setScene(scene);
 
         stage.show();
