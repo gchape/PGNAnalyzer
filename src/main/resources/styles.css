@@ -1,0 +1,21 @@
+.root-pane {
+    -fx-background-color: #a0a0a5;
+    -fx-padding: 10;
+}
+
+.top-bar {
+    -fx-padding: 10;
+    -fx-background-radius: 5px;
+    -fx-background-color: #2e2e2e;
+}
+
+.button {
+    -fx-background-color: #5c6bc0;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 5px 8px;
+}
+
+.button:hover {
+    -fx-background-color: #3f4a94;
+}

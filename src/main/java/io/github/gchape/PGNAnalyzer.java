@@ -1,23 +1,23 @@
 package io.github.gchape;
 
+import io.github.gchape.controller.Controller;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.IOException;
+import java.util.Objects;
 
 public class PGNAnalyzer extends Application {
-    @Override
-    public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(PGNAnalyzer.class.getResource("hello-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-        stage.setTitle("Hello!");
-        stage.setScene(scene);
-        stage.show();
-    }
-
     public static void main(String[] args) {
         launch();
+    }
+
+    @Override
+    public void start(Stage stage) {
+        Scene scene = new Scene(Controller.root(), 600, 500);
+        scene.getStylesheets().add(Objects.requireNonNull(this.getClass().getResource("/styles.css")).toExternalForm());
+        stage.setScene(scene);
+
+        stage.show();
     }
 }
