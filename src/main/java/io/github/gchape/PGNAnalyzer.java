@@ -1,6 +1,6 @@
 package io.github.gchape;
 
-import atlantafx.base.theme.PrimerDark;
+import atlantafx.base.theme.CupertinoLight;
 import io.github.gchape.controller.Controller;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -16,7 +16,7 @@ public class PGNAnalyzer extends Application {
     @Override
     public void start(Stage stage) {
         Scene scene = new Scene(Controller.root(), 650, 500);
-        Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
+        Application.setUserAgentStylesheet(new CupertinoLight().getUserAgentStylesheet());
         scene.getStylesheets().add(Objects.requireNonNull(this.getClass().getResource("/styles.css")).toExternalForm());
         stage.setResizable(true);
         stage.setScene(scene);

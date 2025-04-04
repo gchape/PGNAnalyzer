@@ -80,9 +80,9 @@ public class View {
         root.getStyleClass().add("root-pane");
         topBar.getStyleClass().add("top-bar");
 
-        treeView.setPrefWidth(90);
+        treeView.setPrefWidth(105);
 
-        BorderPane.setMargin(textArea, new Insets(0, 10, 0, 0));
+        BorderPane.setMargin(textArea, new Insets(0, 0, 0, 10));
     }
 
     private void configureBindings() {
@@ -95,7 +95,7 @@ public class View {
 
     private void composeView() {
         root.setTop(topBar);
-        root.setRight(treeView);
+        root.setLeft(treeView);
         root.setCenter(textArea);
 
         topBar.getChildren().addAll(fileSection(), actionSection());
