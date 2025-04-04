@@ -1,12 +1,11 @@
 package io.github.gchape.view;
 
 import io.github.gchape.model.Model;
+import io.github.gchape.view.events.EventHandlers;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -14,51 +13,87 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
 
-import java.io.File;
 import java.lang.reflect.Field;
-import java.util.List;
+import java.util.function.Consumer;
 
 public class View {
     private static final View INSTANCE = new View();
-    private static final Model model = Model.getInstance();
+    private final Model model = Model.getInstance();
 
     private final HBox topBar = new HBox();
     private final BorderPane root = new BorderPane();
 
     private final TextArea textArea = new TextArea();
-    private final TreeItem<String> treeRoot = new TreeItem<>();
-    private final TreeView<String> treeView = new TreeView<>(treeRoot);
-
     private final FileChooser fileChooser = new FileChooser();
+    private final TreeView<String> treeView = new TreeView<>();
 
     private final Button analyze = new Button("Analyze");
-    private final Button persist = new Button("Persist");
-    private final Button chooseFiles = new Button("Choose files");
+    private final Button saveLog = new Button("Save log");
+    private final Button selectFiles = new Button("Select files");
 
-    {
+    private EventHandlers eventHandlers;
+
+    private View() {
+        composeView();
+        configureStyle();
+        configureEvents();
+        configureBindings();
+        configureControls();
+    }
+
+    public static View getInstance() {
+        return INSTANCE;
+    }
+
+    private <T> void configureControl(Class<T> controlClass, Consumer<T> configurer) {
+        for (Field field : getClass().getDeclaredFields()) {
+            if (controlClass.isAssignableFrom(field.getType())) {
+                field.setAccessible(true);
+
+                try {
+                    T instance = controlClass.cast(field.get(this));
+                    configurer.accept(instance);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException("Failed to configure " + controlClass.getSimpleName(), e);
+                }
+            }
+        }
+    }
+
+    private void configureControls() {
+        analyze.setDisable(true);
+        saveLog.setDisable(true);
+
+        configureControl(FileChooser.class, fc -> fc.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("All Files", "*.*"),
+                new FileChooser.ExtensionFilter("PGN Files", "*.pgn"),
+                new FileChooser.ExtensionFilter("Text Files", "*.txt")
+        ));
+
+        configureControl(TextArea.class, ta -> {
+            ta.setWrapText(true);
+            ta.setEditable(true);
+        });
+    }
+
+    private void configureStyle() {
         root.getStyleClass().add("root-pane");
         topBar.getStyleClass().add("top-bar");
 
-        treeRoot.setExpanded(true);
-        treeView.setPrefWidth(80);
-
-        analyze.disableProperty().bind(chooseFiles.disableProperty().not());
-        persist.disableProperty().bind(analyze.disableProperty());
-
-        configure(FileChooser.class);
-        configure(TextArea.class);
-
-        chooseFiles.setOnMouseClicked(e -> {
-            List<File> selectedFiles = fileChooser.showOpenMultipleDialog(((Node) e.getSource()).getScene().getWindow());
-
-            if (selectedFiles != null) {
-                model.getSelectedFiles().clear();
-                model.getSelectedFiles().addAll(selectedFiles);
-            }
-        });
+        treeView.setPrefWidth(90);
 
         BorderPane.setMargin(textArea, new Insets(0, 10, 0, 0));
+    }
 
+    private void configureBindings() {
+        treeView.rootProperty().bind(model.fileTreeProperty());
+    }
+
+    private void configureEvents() {
+        selectFiles.setOnMouseClicked(e -> eventHandlers.fileChooserMouseClickAction(e, fileChooser));
+    }
+
+    private void composeView() {
         root.setTop(topBar);
         root.setRight(treeView);
         root.setCenter(textArea);
@@ -66,68 +101,29 @@ public class View {
         topBar.getChildren().addAll(fileSection(), actionSection());
     }
 
-    private View() {
-    }
-
-    public static View getInstance() {
-        return INSTANCE;
-    }
-
-    private void configure(Class<?> control) {
-        for (Field field : this.getClass().getDeclaredFields()) {
-            if (field.getType().equals(control)) {
-                switch (control.getSimpleName()) {
-                    case "FileChooser" -> {
-                        try {
-                            field.setAccessible(true);
-
-                            var fileChooser = (FileChooser) field.get(this);
-                            fileChooser.getExtensionFilters().addAll(
-                                    new FileChooser.ExtensionFilter("All Files", "*.*"),
-                                    new FileChooser.ExtensionFilter("*.pgn", "*.pgn"),
-                                    new FileChooser.ExtensionFilter("*.txt", "*.txt")
-                            );
-                        } catch (IllegalAccessException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                    case "TextArea" -> {
-                        field.setAccessible(true);
-                        try {
-                            var textArea = (TextArea) field.get(this);
-                            textArea.setWrapText(true);
-                            textArea.setEditable(true);
-                        } catch (IllegalAccessException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-
-                    default -> {
-                    }
-                }
-            }
-        }
-    }
-
     private HBox actionSection() {
         return new HBox() {{
-            getChildren().addAll(analyze, persist);
-
             setSpacing(10.0);
             setAlignment(Pos.CENTER_RIGHT);
+
+            getChildren().addAll(analyze, saveLog);
         }};
     }
 
     private HBox fileSection() {
         return new HBox() {{
-            getChildren().add(chooseFiles);
-
             setAlignment(Pos.CENTER_LEFT);
             HBox.setHgrow(this, Priority.ALWAYS);
+
+            getChildren().add(selectFiles);
         }};
     }
 
     public Region getRoot() {
         return root;
+    }
+
+    public void setEventHandlers(EventHandlers eventHandlers) {
+        this.eventHandlers = eventHandlers;
     }
 }

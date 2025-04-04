@@ -1,0 +1,10 @@
+package io.github.gchape.view.events;
+
+import javafx.scene.input.MouseEvent;
+import javafx.stage.FileChooser;
+
+public interface EventHandlers {
+    void fileChooserMouseClickAction(final MouseEvent mouseEvent, final FileChooser fileChooser);
+    void analyzeButtonMouseClickAction(final MouseEvent mouseEvent);
+    void saveLogButtonMouseClickAction(final MouseEvent mouseEvent);
+}

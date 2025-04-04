@@ -20,3 +20,19 @@
     -fx-font-size: 14px;
     -fx-font-family: "Segoe UI", sans-serif;
 }
+
+/* ========== TreeView ========== */
+.tree-view {
+    -fx-padding: 2px;
+    -fx-font-size: 12px;
+}
+
+/* Hide scrollbars */
+.tree-view .scroll-bar:vertical,
+.tree-view .scroll-bar:horizontal {
+    -fx-opacity: 0;
+    -fx-max-width: 0;
+    -fx-max-height: 0;
+    -fx-pref-width: 0;
+    -fx-pref-height: 0;
+}

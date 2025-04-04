@@ -1,6 +1,6 @@
 package io.github.gchape;
 
-import atlantafx.base.theme.Dracula;
+import atlantafx.base.theme.PrimerDark;
 import io.github.gchape.controller.Controller;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -16,9 +16,9 @@ public class PGNAnalyzer extends Application {
     @Override
     public void start(Stage stage) {
         Scene scene = new Scene(Controller.root(), 650, 500);
-        Application.setUserAgentStylesheet(new Dracula().getUserAgentStylesheet());
+        Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
         scene.getStylesheets().add(Objects.requireNonNull(this.getClass().getResource("/styles.css")).toExternalForm());
-        stage.setResizable(false);
+        stage.setResizable(true);
         stage.setScene(scene);
 
         stage.show();

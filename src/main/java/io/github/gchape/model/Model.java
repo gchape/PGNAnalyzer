@@ -1,17 +1,21 @@
 package io.github.gchape.model;
 
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.TreeItem;
 
 import java.io.File;
 
 public class Model {
     private final static Model INSTANCE = new Model();
 
-    private final ObservableList<File> selectedFiles;
+    private final ListProperty<File> selectedFiles;
+    private final ObjectProperty<TreeItem<String>> fileTree;
 
     private Model() {
-        selectedFiles = FXCollections.emptyObservableList();
+        selectedFiles = new SimpleListProperty<>(FXCollections.observableArrayList());
+        fileTree = new SimpleObjectProperty<>(new TreeItem<>());
     }
 
     public static Model getInstance() {
@@ -19,6 +23,18 @@ public class Model {
     }
 
     public ObservableList<File> getSelectedFiles() {
+        return selectedFiles.get();
+    }
+
+    public ReadOnlyListProperty<File> selectedFilesProperty() {
         return selectedFiles;
+    }
+
+    public TreeItem<String> getFileTree() {
+        return fileTree.get();
+    }
+
+    public ReadOnlyObjectProperty<TreeItem<String>> fileTreeProperty() {
+        return fileTree;
     }
 }
