@@ -7,6 +7,7 @@ import java.io.File;
 
 public class Model {
     private final static Model INSTANCE = new Model();
+
     private final ObservableList<File> selectedFiles;
 
     private Model() {

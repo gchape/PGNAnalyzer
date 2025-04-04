@@ -15,6 +15,7 @@ import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.List;
 
 public class View {
@@ -28,28 +29,26 @@ public class View {
     private final TreeItem<String> treeRoot = new TreeItem<>();
     private final TreeView<String> treeView = new TreeView<>(treeRoot);
 
+    private final FileChooser fileChooser = new FileChooser();
+
     private final Button analyze = new Button("Analyze");
-    private final Button chessboard = new Button("Chessboard");
+    private final Button persist = new Button("Persist");
     private final Button chooseFiles = new Button("Choose files");
 
     {
         root.getStyleClass().add("root-pane");
         topBar.getStyleClass().add("top-bar");
 
-        textArea.setWrapText(true);
-        textArea.setEditable(true);
-
         treeRoot.setExpanded(true);
-        treeView.setPrefWidth(115);
+        treeView.setPrefWidth(80);
 
         analyze.disableProperty().bind(chooseFiles.disableProperty().not());
-        chessboard.disableProperty().bind(analyze.disableProperty());
+        persist.disableProperty().bind(analyze.disableProperty());
+
+        configure(FileChooser.class);
+        configure(TextArea.class);
 
         chooseFiles.setOnMouseClicked(e -> {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PGN Files", "*.pgn"));
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
-
             List<File> selectedFiles = fileChooser.showOpenMultipleDialog(((Node) e.getSource()).getScene().getWindow());
 
             if (selectedFiles != null) {
@@ -74,9 +73,46 @@ public class View {
         return INSTANCE;
     }
 
+    private void configure(Class<?> control) {
+        for (Field field : this.getClass().getDeclaredFields()) {
+            if (field.getType().equals(control)) {
+                switch (control.getSimpleName()) {
+                    case "FileChooser" -> {
+                        try {
+                            field.setAccessible(true);
+
+                            var fileChooser = (FileChooser) field.get(this);
+                            fileChooser.getExtensionFilters().addAll(
+                                    new FileChooser.ExtensionFilter("All Files", "*.*"),
+                                    new FileChooser.ExtensionFilter("*.pgn", "*.pgn"),
+                                    new FileChooser.ExtensionFilter("*.txt", "*.txt")
+                            );
+                        } catch (IllegalAccessException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    case "TextArea" -> {
+                        field.setAccessible(true);
+                        try {
+                            var textArea = (TextArea) field.get(this);
+                            textArea.setWrapText(true);
+                            textArea.setEditable(true);
+                        } catch (IllegalAccessException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                    default -> {
+                    }
+                }
+            }
+        }
+    }
+
     private HBox actionSection() {
         return new HBox() {{
-            getChildren().addAll(analyze, chessboard);
+            getChildren().addAll(analyze, persist);
+
             setSpacing(10.0);
             setAlignment(Pos.CENTER_RIGHT);
         }};
@@ -85,6 +121,7 @@ public class View {
     private HBox fileSection() {
         return new HBox() {{
             getChildren().add(chooseFiles);
+
             setAlignment(Pos.CENTER_LEFT);
             HBox.setHgrow(this, Priority.ALWAYS);
         }};
