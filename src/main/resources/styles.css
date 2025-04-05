@@ -1,6 +1,10 @@
 /* Root Pane */
 .root-pane {
     -fx-padding: 10px;
+    -fx-background-image: url("file:src/main/resources/background.jpg");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center center;
+    -fx-background-size: cover;
 }
 
 /* Top Bar */
