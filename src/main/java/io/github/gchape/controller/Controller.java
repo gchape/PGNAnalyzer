@@ -1,5 +1,6 @@
 package io.github.gchape.controller;
 
+import io.github.gchape.logic.Analyzer;
 import io.github.gchape.model.Model;
 import io.github.gchape.view.View;
 import io.github.gchape.view.events.EventHandlers;
@@ -28,22 +29,34 @@ public class Controller {
         view.setEventHandlers(new EventHandlers() {
             @Override
             public void fileChooserMouseClickAction(MouseEvent mouseEvent, FileChooser fileChooser) {
-                var selectedFiles = fileChooser.showOpenMultipleDialog(((Node) mouseEvent.getSource()).getScene().getWindow());
+                var stage = ((Node) mouseEvent.getSource()).getScene().getWindow();
+                var selectedFiles = fileChooser.showOpenMultipleDialog(stage);
 
                 if (selectedFiles != null) {
                     model.getSelectedFiles().clear();
                     model.getSelectedFiles().addAll(selectedFiles);
+
+                    model.analyzeDisabledProperty().set(false);
                 }
             }
 
             @Override
-            public void analyzeButtonMouseClickAction(MouseEvent mouseEvent) {
-                // TODO
+            public void analyzeMouseClickAction(MouseEvent mouseEvent) {
+                model.selectFilesDisabledProperty().set(true);
+
+                model.getSelectedFiles()
+                        .parallelStream()
+                        .map(f -> new Analyzer(f, model.textAreaProperty()))
+                        .forEach(Thread.ofVirtual()::start);
+
+                model.saveLogDisabledProperty().set(false);
             }
 
             @Override
-            public void saveLogButtonMouseClickAction(MouseEvent mouseEvent) {
-                // TODO
+            public void saveLogMouseClickAction(MouseEvent mouseEvent) {
+                model.saveLogDisabledProperty().set(true);
+                model.analyzeDisabledProperty().set(false);
+                model.selectFilesDisabledProperty().set(false);
             }
         });
     }

@@ -61,9 +61,6 @@ public class View {
     }
 
     private void configureControls() {
-        analyze.setDisable(true);
-        saveLog.setDisable(true);
-
         configureControl(FileChooser.class, fc -> fc.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("All Files", "*.*"),
                 new FileChooser.ExtensionFilter("PGN Files", "*.pgn"),
@@ -72,7 +69,7 @@ public class View {
 
         configureControl(TextArea.class, ta -> {
             ta.setWrapText(true);
-            ta.setEditable(true);
+            ta.setEditable(false);
         });
     }
 
@@ -87,10 +84,17 @@ public class View {
 
     private void configureBindings() {
         treeView.rootProperty().bind(model.fileTreeProperty());
+
+        textArea.textProperty().bind(model.textAreaProperty());
+        saveLog.disableProperty().bind(model.saveLogDisabledProperty());
+        analyze.disableProperty().bind(model.analyzeDisabledProperty());
+        selectFiles.disableProperty().bind(model.selectFilesDisabledProperty());
     }
 
     private void configureEvents() {
         selectFiles.setOnMouseClicked(e -> eventHandlers.fileChooserMouseClickAction(e, fileChooser));
+        analyze.setOnMouseClicked(e -> eventHandlers.analyzeMouseClickAction(e));
+        saveLog.setOnMouseClicked(e -> eventHandlers.saveLogMouseClickAction(e));
     }
 
     private void composeView() {
