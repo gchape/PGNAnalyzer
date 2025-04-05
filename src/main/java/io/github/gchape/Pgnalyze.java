@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 
 import java.util.Objects;
 
-public class PGNAnalyzer extends Application {
+public class Pgnalyze extends Application {
     public static void main(String[] args) {
         launch();
     }
@@ -16,10 +16,13 @@ public class PGNAnalyzer extends Application {
     @Override
     public void start(Stage stage) {
         Scene scene = new Scene(Controller.root(), 650, 500);
-        Application.setUserAgentStylesheet(new CupertinoDark().getUserAgentStylesheet());
-        scene.getStylesheets().add(Objects.requireNonNull(this.getClass().getResource("/styles.css")).toExternalForm());
         stage.setResizable(true);
         stage.setScene(scene);
+
+        Application.setUserAgentStylesheet(new CupertinoDark().getUserAgentStylesheet());
+        scene.getStylesheets()
+                .add(Objects.requireNonNull(this.getClass().getResource("/styles.css"))
+                        .toExternalForm());
 
         stage.show();
     }

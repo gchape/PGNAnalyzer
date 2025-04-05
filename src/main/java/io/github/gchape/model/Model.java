@@ -14,18 +14,18 @@ public class Model {
     private final ObjectProperty<TreeItem<String>> fileTree;
 
     private final StringProperty textArea;
-    private final BooleanProperty saveLogDisabled;
-    private final BooleanProperty analyzeDisabled;
-    private final BooleanProperty selectFilesDisabled;
+    private final BooleanProperty saveLogButtonDisabled;
+    private final BooleanProperty analyzeButtonDisabled;
+    private final BooleanProperty selectFilesButtonDisabled;
 
     private Model() {
         fileTree = new SimpleObjectProperty<>(new TreeItem<>());
         selectedFiles = new SimpleListProperty<>(FXCollections.observableArrayList());
 
         textArea = new SimpleStringProperty("");
-        saveLogDisabled = new SimpleBooleanProperty(true);
-        analyzeDisabled = new SimpleBooleanProperty(true);
-        selectFilesDisabled = new SimpleBooleanProperty(false);
+        saveLogButtonDisabled = new SimpleBooleanProperty(true);
+        analyzeButtonDisabled = new SimpleBooleanProperty(true);
+        selectFilesButtonDisabled = new SimpleBooleanProperty(false);
     }
 
     public static Model getInstance() {
@@ -48,16 +48,16 @@ public class Model {
         return fileTree;
     }
 
-    public BooleanProperty saveLogDisabledProperty() {
-        return saveLogDisabled;
+    public BooleanProperty saveLogButtonDisabledProperty() {
+        return saveLogButtonDisabled;
     }
 
-    public BooleanProperty analyzeDisabledProperty() {
-        return analyzeDisabled;
+    public BooleanProperty analyzeButtonDisabledProperty() {
+        return analyzeButtonDisabled;
     }
 
-    public BooleanProperty selectFilesDisabledProperty() {
-        return selectFilesDisabled;
+    public BooleanProperty selectFilesButtonDisabledProperty() {
+        return selectFilesButtonDisabled;
     }
 
     public StringProperty textAreaProperty() {

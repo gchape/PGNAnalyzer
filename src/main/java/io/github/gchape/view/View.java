@@ -1,7 +1,7 @@
 package io.github.gchape.view;
 
 import io.github.gchape.model.Model;
-import io.github.gchape.view.events.EventHandlers;
+import io.github.gchape.view.handlers.MouseClickEvents;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -31,7 +31,7 @@ public class View {
     private final Button saveLog = new Button("Save log");
     private final Button selectFiles = new Button("Select files");
 
-    private EventHandlers eventHandlers;
+    private MouseClickEvents eventHandlers;
 
     private View() {
         composeView();
@@ -61,10 +61,8 @@ public class View {
     }
 
     private void configureControls() {
-        configureControl(FileChooser.class, fc -> fc.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("All Files", "*.*"),
-                new FileChooser.ExtensionFilter("PGN Files", "*.pgn"),
-                new FileChooser.ExtensionFilter("Text Files", "*.txt")
+        configureControl(FileChooser.class, fc -> fc.getExtensionFilters().addFirst(
+                new FileChooser.ExtensionFilter("*.pgn", "*.pgn")
         ));
 
         configureControl(TextArea.class, ta -> {
@@ -86,15 +84,15 @@ public class View {
         treeView.rootProperty().bind(model.fileTreeProperty());
 
         textArea.textProperty().bind(model.textAreaProperty());
-        saveLog.disableProperty().bind(model.saveLogDisabledProperty());
-        analyze.disableProperty().bind(model.analyzeDisabledProperty());
-        selectFiles.disableProperty().bind(model.selectFilesDisabledProperty());
+        saveLog.disableProperty().bind(model.saveLogButtonDisabledProperty());
+        analyze.disableProperty().bind(model.analyzeButtonDisabledProperty());
+        selectFiles.disableProperty().bind(model.selectFilesButtonDisabledProperty());
     }
 
     private void configureEvents() {
-        selectFiles.setOnMouseClicked(e -> eventHandlers.fileChooserMouseClickAction(e, fileChooser));
-        analyze.setOnMouseClicked(e -> eventHandlers.analyzeMouseClickAction(e));
-        saveLog.setOnMouseClicked(e -> eventHandlers.saveLogMouseClickAction(e));
+        analyze.setOnMouseClicked(e -> eventHandlers.analyzeButton(e));
+        saveLog.setOnMouseClicked(e -> eventHandlers.saveLogButton(e));
+        selectFiles.setOnMouseClicked(e -> eventHandlers.fileChooser(e, fileChooser));
     }
 
     private void composeView() {
@@ -127,7 +125,7 @@ public class View {
         return root;
     }
 
-    public void setEventHandlers(EventHandlers eventHandlers) {
+    public void setEventHandlers(MouseClickEvents eventHandlers) {
         this.eventHandlers = eventHandlers;
     }
 }

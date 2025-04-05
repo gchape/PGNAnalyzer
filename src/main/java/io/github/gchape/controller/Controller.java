@@ -1,9 +1,9 @@
 package io.github.gchape.controller;
 
-import io.github.gchape.logic.Analyzer;
+import io.github.gchape.controller.logic.Analyze;
 import io.github.gchape.model.Model;
 import io.github.gchape.view.View;
-import io.github.gchape.view.events.EventHandlers;
+import io.github.gchape.view.handlers.MouseClickEvents;
 import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import javafx.scene.input.MouseEvent;
@@ -26,37 +26,36 @@ public class Controller {
             }
         });
 
-        view.setEventHandlers(new EventHandlers() {
+        view.setEventHandlers(new MouseClickEvents() {
             @Override
-            public void fileChooserMouseClickAction(MouseEvent mouseEvent, FileChooser fileChooser) {
+            public void fileChooser(MouseEvent mouseEvent, FileChooser fileChooser) {
                 var stage = ((Node) mouseEvent.getSource()).getScene().getWindow();
                 var selectedFiles = fileChooser.showOpenMultipleDialog(stage);
 
                 if (selectedFiles != null) {
                     model.getSelectedFiles().clear();
                     model.getSelectedFiles().addAll(selectedFiles);
-
-                    model.analyzeDisabledProperty().set(false);
+                    model.analyzeButtonDisabledProperty().set(false);
                 }
             }
 
             @Override
-            public void analyzeMouseClickAction(MouseEvent mouseEvent) {
-                model.selectFilesDisabledProperty().set(true);
+            public void analyzeButton(MouseEvent mouseEvent) {
+                model.selectFilesButtonDisabledProperty().set(true);
 
                 model.getSelectedFiles()
                         .parallelStream()
-                        .map(f -> new Analyzer(f, model.textAreaProperty()))
+                        .map(Analyze::new)
                         .forEach(Thread.ofVirtual()::start);
 
-                model.saveLogDisabledProperty().set(false);
+                model.saveLogButtonDisabledProperty().set(false);
             }
 
             @Override
-            public void saveLogMouseClickAction(MouseEvent mouseEvent) {
-                model.saveLogDisabledProperty().set(true);
-                model.analyzeDisabledProperty().set(false);
-                model.selectFilesDisabledProperty().set(false);
+            public void saveLogButton(MouseEvent mouseEvent) {
+                model.saveLogButtonDisabledProperty().set(true);
+                model.analyzeButtonDisabledProperty().set(false);
+                model.selectFilesButtonDisabledProperty().set(false);
             }
         });
     }

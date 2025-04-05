@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.gchape</groupId>
-    <artifactId>pgn-analyzer</artifactId>
+    <artifactId>pgnalyzefx</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>PGNAnalyzer</name>
+    <name>PgnalyzeFX</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -60,7 +60,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>io.github.gchape.pgnanalyzer/io.github.gchape.PGNAnalyzer
+                            <mainClass>io.github.gchape.pgnsurveyfx/io.github.gchape.Pgnalyze
                             </mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
