@@ -1,4 +1,4 @@
-module io.github.gchape.pgnanalyzer {
+module io.github.gchape.pgnalyzefx {
     requires atlantafx.base;
     requires javafx.controls;
 
