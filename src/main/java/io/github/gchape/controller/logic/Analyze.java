@@ -10,17 +10,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 public class Analyze implements Runnable {
+    private static final AtomicInteger idCounter = new AtomicInteger(0);
     private final String body;
     private final Map<String, String> headers = new HashMap<>();
     private final StringProperty textArea = Model.getInstance().textAreaProperty();
-
-    private static final AtomicInteger idCounter = new AtomicInteger(0);
     private final int id;
 
     public Analyze(StringBuilder header, StringBuilder body) {
         this.body = body.toString()
-                .replaceAll("\\d+\\.(\\s)?", "")
+                .replaceAll(";.*", "")
                 .replaceAll("\\s+", " ")
+                .replaceAll("[+#?!]", "")
+                .replaceAll("\\d+\\.", "")
+                .replaceAll("\\{[^}]*}", "")
                 .trim();
 
         var pattern = Pattern.compile("\\[(\\w+)\\s+\"([^\"]*)\"]");
@@ -52,8 +54,11 @@ public class Analyze implements Runnable {
             String blackMove = i + 1 < moves.length ? moves[i + 1] : "";
 
             try {
-                board.move(whiteMove + " " + blackMove);
+                System.out.println(whiteMove + " " + blackMove);
+                board.tryMove(whiteMove, true);
+                board.tryMove(blackMove, false);
             } catch (Exception e) {
+                e.printStackTrace();
                 valid = false;
                 break;
             }

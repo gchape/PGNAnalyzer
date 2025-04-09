@@ -65,6 +65,7 @@ public class Controller {
                                     if (line.isBlank()) break;
 
                                     body.append(line);
+                                    body.append(" ");
                                 }
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
