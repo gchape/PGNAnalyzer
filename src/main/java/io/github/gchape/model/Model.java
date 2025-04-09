@@ -13,8 +13,6 @@ public class Model {
     private final ListProperty<File> selectedFiles;
     private final ObjectProperty<TreeItem<String>> fileTree;
 
-    private final StringProperty textArea;
-    private final BooleanProperty saveLogButtonDisabled;
     private final BooleanProperty analyzeButtonDisabled;
     private final BooleanProperty selectFilesButtonDisabled;
 
@@ -22,8 +20,6 @@ public class Model {
         fileTree = new SimpleObjectProperty<>(new TreeItem<>());
         selectedFiles = new SimpleListProperty<>(FXCollections.observableArrayList());
 
-        textArea = new SimpleStringProperty("");
-        saveLogButtonDisabled = new SimpleBooleanProperty(true);
         analyzeButtonDisabled = new SimpleBooleanProperty(true);
         selectFilesButtonDisabled = new SimpleBooleanProperty(false);
     }
@@ -48,19 +44,11 @@ public class Model {
         return fileTree;
     }
 
-    public BooleanProperty saveLogButtonDisabledProperty() {
-        return saveLogButtonDisabled;
-    }
-
     public BooleanProperty analyzeButtonDisabledProperty() {
         return analyzeButtonDisabled;
     }
 
     public BooleanProperty selectFilesButtonDisabledProperty() {
         return selectFilesButtonDisabled;
-    }
-
-    public StringProperty textAreaProperty() {
-        return textArea;
     }
 }

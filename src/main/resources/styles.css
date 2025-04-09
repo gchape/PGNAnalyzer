@@ -1,4 +1,3 @@
-/* Root Pane */
 .root-pane {
     -fx-padding: 10px;
     -fx-background-image: url("file:src/main/resources/background.jpg");
@@ -7,31 +6,26 @@
     -fx-background-size: cover;
 }
 
-/* Top Bar */
 .top-bar {
     -fx-padding: 10px 0;
 }
 
-/* Buttons */
 .button {
     -fx-padding: 8px 18px;
     -fx-cursor: hand;
 }
 
-/* Text Area */
 .text-area {
     -fx-padding: 5px;
     -fx-font-size: 14px;
     -fx-font-family: "Segoe UI", sans-serif;
 }
 
-/* ========== TreeView ========== */
 .tree-view {
     -fx-padding: 2px;
     -fx-font-size: 12px;
 }
 
-/* Hide scrollbars */
 .tree-view .scroll-bar:vertical,
 .tree-view .scroll-bar:horizontal {
     -fx-opacity: 0;
