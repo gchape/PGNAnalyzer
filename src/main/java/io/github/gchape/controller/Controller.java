@@ -10,6 +10,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 public class Controller {
     private final static View view = View.getInstance();
     private final static Model model = Model.getInstance();
@@ -30,7 +35,7 @@ public class Controller {
             @Override
             public void fileChooser(MouseEvent mouseEvent, FileChooser fileChooser) {
                 var stage = ((Node) mouseEvent.getSource()).getScene().getWindow();
-                var selectedFiles = fileChooser.showOpenMultipleDialog(stage);
+                var selectedFiles = fileChooser.showOpenDialog(stage);
 
                 if (selectedFiles != null) {
                     model.getSelectedFiles().clear();
@@ -44,8 +49,30 @@ public class Controller {
                 model.selectFilesButtonDisabledProperty().set(true);
 
                 model.getSelectedFiles()
-                        .parallelStream()
-                        .map(Analyze::new)
+                        .stream()
+                        .map(file -> {
+                            var header = new StringBuilder();
+                            var body = new StringBuilder();
+                            try (var reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
+                                String line;
+                                while ((line = reader.readLine()) != null) {
+                                    if (line.isBlank()) break;
+
+                                    header.append(line);
+                                }
+
+                                while ((line = reader.readLine()) != null) {
+                                    if (line.isBlank()) break;
+
+                                    body.append(line);
+                                }
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+
+                            return new Analyze(header, body);
+                        })
+                        .parallel()
                         .forEach(Thread.ofVirtual()::start);
 
                 model.saveLogButtonDisabledProperty().set(false);
