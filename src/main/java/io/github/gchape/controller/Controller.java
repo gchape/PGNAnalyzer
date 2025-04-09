@@ -14,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 public class Controller {
     private final static View view = View.getInstance();
@@ -48,33 +49,38 @@ public class Controller {
             public void analyzeButton(MouseEvent mouseEvent) {
                 model.selectFilesButtonDisabledProperty().set(true);
 
-                model.getSelectedFiles()
-                        .stream()
-                        .map(file -> {
-                            var header = new StringBuilder();
-                            var body = new StringBuilder();
-                            try (var reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
-                                String line;
-                                while ((line = reader.readLine()) != null) {
-                                    if (line.isBlank()) break;
+                var file = model.getSelectedFiles().getFirst();
+                var games = new ArrayList<Analyze>();
+                var header = new StringBuilder();
+                var body = new StringBuilder();
+                try (var reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
+                    while (true) {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            if (line.isBlank()) break;
+                            header.append(line).append("\n");
+                        }
 
-                                    header.append(line);
-                                }
+                        while ((line = reader.readLine()) != null) {
+                            if (line.isBlank()) break;
+                            body.append(line).append(" ");
+                        }
 
-                                while ((line = reader.readLine()) != null) {
-                                    if (line.isBlank()) break;
+                        if (line == null) break;
 
-                                    body.append(line);
-                                    body.append(" ");
-                                }
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
+                        Analyze game = new Analyze(header, body);
+                        games.add(game);
 
-                            return new Analyze(header, body);
-                        })
+                        header.setLength(0);
+                        body.setLength(0);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                games.stream()
                         .parallel()
-                        .forEach(Thread.ofVirtual()::start);
+                        .forEach(game -> Thread.ofVirtual().start(game));
 
                 model.saveLogButtonDisabledProperty().set(false);
             }

@@ -2,8 +2,16 @@ package io.github.gchape.controller.logic;
 
 import io.github.gchape.model.Model;
 import io.github.gchape.model.entities.Board;
+import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -45,7 +53,7 @@ public class Analyze implements Runnable {
                     "Event": "%s",
                     "White": "%s",
                     "Black": "%s"
-                }
+                },
                 """.formatted(id, headers.get("Event"), headers.get("White"), headers.get("Black")));
 
         boolean valid = true;
@@ -54,21 +62,38 @@ public class Analyze implements Runnable {
             String blackMove = i + 1 < moves.length ? moves[i + 1] : "";
 
             try {
-                System.out.println(whiteMove + " " + blackMove);
                 board.tryMove(whiteMove, true);
                 board.tryMove(blackMove, false);
             } catch (Exception e) {
-                e.printStackTrace();
+                writeInLog(e.getMessage());
+
                 valid = false;
                 break;
             }
         }
 
-        textArea.set(textArea.get() + """
+        boolean finalValid = valid;
+        Platform.runLater(() -> {
+            textArea.set(textArea.get() + """
                 {
                     "id": %d,
                     "Valid": %s
-                }
-                """.formatted(id, valid ? "true" : "false"));
+                },
+                """.formatted(id, finalValid ? "true" : "false"));
+        });
+    }
+
+    private void writeInLog(String message) {
+        try {
+            Path path = Path.of("src/main/resources/%s.log".formatted(LocalDate.now()));
+            if (!Files.exists(path))
+                Files.createFile(path);
+
+            try (var writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path.toFile())))) {
+                writer.write(message);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
