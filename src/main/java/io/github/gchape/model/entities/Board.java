@@ -122,17 +122,20 @@ public class Board {
             case QUEEN -> handleQueenCapture(isWhite, toCapture);
             case KNIGHT -> handleKnightCapture(isWhite, toCapture);
             case ROOK -> handleStraightCapture(isWhite, toCapture);
-            case PAWN -> handlePawnCapture(move, isWhite, toCapture);
+            case PAWN -> handlePawnCapture(isWhite, pieceType + "", toCapture);
             case BISHOP -> handleDiagonalCapture(isWhite, toCapture);
             default -> throw new IllegalArgumentException("Invalid piece type");
         }
     }
 
-    private void handlePawnCapture(String move, boolean isWhite, String toCapture) {
+    private void handlePawnCapture(boolean isWhite, String flag, String toCapture) {
         var pieces = isWhite ? whitePieces : blackPieces;
         var opponentPieces = isWhite ? blackPieces : whitePieces;
 
-        for (String from : pieces.get(Piece.PAWN)) {
+        for (String from : pieces.get(Piece.PAWN)
+                .stream()
+                .filter(position -> position.contains(flag))
+                .collect(Collectors.toSet())) {
             var fromYX = toYX(from);
             var toYX = toYX(toCapture);
 

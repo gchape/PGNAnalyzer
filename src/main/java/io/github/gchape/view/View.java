@@ -22,15 +22,11 @@ public class View {
 
     private final HBox topBar = new HBox();
     private final BorderPane root = new BorderPane();
-
     private final TextArea textArea = new TextArea();
     private final FileChooser fileChooser = new FileChooser();
     private final TreeView<String> treeView = new TreeView<>();
-
     private final Button analyze = new Button("Analyze");
-    private final Button saveLog = new Button("Save log");
     private final Button selectFiles = new Button("Select files");
-
     private MouseClickEvents eventHandlers;
 
     private View() {
@@ -43,6 +39,10 @@ public class View {
 
     public static View getInstance() {
         return INSTANCE;
+    }
+
+    public TextArea getTextArea() {
+        return textArea;
     }
 
     private <T> void configureControl(Class<T> controlClass, Consumer<T> configurer) {
@@ -83,15 +83,12 @@ public class View {
     private void configureBindings() {
         treeView.rootProperty().bind(model.fileTreeProperty());
 
-        textArea.textProperty().bind(model.textAreaProperty());
-        saveLog.disableProperty().bind(model.saveLogButtonDisabledProperty());
         analyze.disableProperty().bind(model.analyzeButtonDisabledProperty());
         selectFiles.disableProperty().bind(model.selectFilesButtonDisabledProperty());
     }
 
     private void configureEvents() {
         analyze.setOnMouseClicked(e -> eventHandlers.analyzeButton(e));
-        saveLog.setOnMouseClicked(e -> eventHandlers.saveLogButton(e));
         selectFiles.setOnMouseClicked(e -> eventHandlers.fileChooser(e, fileChooser));
     }
 
@@ -108,7 +105,7 @@ public class View {
             setSpacing(10.0);
             setAlignment(Pos.CENTER_RIGHT);
 
-            getChildren().addAll(analyze, saveLog);
+            getChildren().add(analyze);
         }};
     }
 

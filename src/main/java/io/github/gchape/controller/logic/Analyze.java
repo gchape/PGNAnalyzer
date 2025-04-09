@@ -1,17 +1,9 @@
 package io.github.gchape.controller.logic;
 
-import io.github.gchape.model.Model;
 import io.github.gchape.model.entities.Board;
 import javafx.application.Platform;
-import javafx.beans.property.StringProperty;
+import javafx.scene.control.TextArea;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -20,11 +12,11 @@ import java.util.regex.Pattern;
 public class Analyze implements Runnable {
     private static final AtomicInteger idCounter = new AtomicInteger(0);
     private final String body;
+    private final TextArea textArea;
     private final Map<String, String> headers = new HashMap<>();
-    private final StringProperty textArea = Model.getInstance().textAreaProperty();
     private final int id;
 
-    public Analyze(StringBuilder header, StringBuilder body) {
+    public Analyze(StringBuilder header, StringBuilder body, TextArea textArea) {
         this.body = body.toString()
                 .replaceAll(";.*", "")
                 .replaceAll("\\s+", " ")
@@ -39,6 +31,7 @@ public class Analyze implements Runnable {
             headers.put(matcher.group(1), matcher.group(2));
         }
 
+        this.textArea = textArea;
         this.id = idCounter.incrementAndGet();
     }
 
@@ -47,14 +40,14 @@ public class Analyze implements Runnable {
         Board board = new Board();
         String[] moves = body.split(" ");
 
-        textArea.set(textArea.get() + """
+        Platform.runLater(() -> textArea.appendText("""
                 {
                     "id": %d,
                     "Event": "%s",
                     "White": "%s",
                     "Black": "%s"
-                },
-                """.formatted(id, headers.get("Event"), headers.get("White"), headers.get("Black")));
+                }
+                """.formatted(id, headers.get("Event"), headers.get("White"), headers.get("Black"))));
 
         boolean valid = true;
         for (int i = 0; i < moves.length; i += 2) {
@@ -65,35 +58,18 @@ public class Analyze implements Runnable {
                 board.tryMove(whiteMove, true);
                 board.tryMove(blackMove, false);
             } catch (Exception e) {
-                writeInLog(e.getMessage());
-
+                e.printStackTrace();
                 valid = false;
                 break;
             }
         }
 
-        boolean finalValid = valid;
-        Platform.runLater(() -> {
-            textArea.set(textArea.get() + """
-                {
-                    "id": %d,
-                    "Valid": %s
-                },
-                """.formatted(id, finalValid ? "true" : "false"));
-        });
-    }
-
-    private void writeInLog(String message) {
-        try {
-            Path path = Path.of("src/main/resources/%s.log".formatted(LocalDate.now()));
-            if (!Files.exists(path))
-                Files.createFile(path);
-
-            try (var writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path.toFile())))) {
-                writer.write(message);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        boolean isValid = valid;
+        Platform.runLater(() -> textArea.appendText("""
+                        {
+                            "id": %d,
+                            "Valid": %s
+                        }
+                """.formatted(id, isValid ? "true" : "false")));
     }
 }

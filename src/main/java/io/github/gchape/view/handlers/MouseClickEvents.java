@@ -7,6 +7,4 @@ public interface MouseClickEvents {
     void fileChooser(final MouseEvent mouseEvent, final FileChooser fileChooser);
 
     void analyzeButton(final MouseEvent mouseEvent);
-
-    void saveLogButton(final MouseEvent mouseEvent);
 }
