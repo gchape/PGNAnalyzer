@@ -10,6 +10,7 @@ import java.io.File;
 public class Model {
     private final static Model INSTANCE = new Model();
 
+    private final StringProperty textInput;
     private final ListProperty<File> selectedFiles;
     private final ObjectProperty<TreeItem<String>> fileTree;
 
@@ -22,6 +23,8 @@ public class Model {
 
         analyzeButtonDisabled = new SimpleBooleanProperty(true);
         selectFilesButtonDisabled = new SimpleBooleanProperty(false);
+
+        textInput = new SimpleStringProperty("");
     }
 
     public static Model getInstance() {
@@ -50,5 +53,9 @@ public class Model {
 
     public BooleanProperty selectFilesButtonDisabledProperty() {
         return selectFilesButtonDisabled;
+    }
+
+    public StringProperty textInputProperty() {
+        return textInput;
     }
 }

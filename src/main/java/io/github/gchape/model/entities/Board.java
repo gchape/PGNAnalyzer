@@ -3,7 +3,6 @@ package io.github.gchape.model.entities;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 public class Board {
     private final Map<Piece, Set<String>> blackPieces = Map.of(
@@ -22,16 +21,5 @@ public class Board {
             Piece.BISHOP, new HashSet<>(Set.of("c1", "f1")),
             Piece.KNIGHT, new HashSet<>(Set.of("b1", "g1")),
             Piece.PAWN, new HashSet<>(Set.of("a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2"))
-
     );
-
-    public void tryMove(String move, boolean isWhite) throws IllegalArgumentException, IllegalStateException {
-        if (Pattern.matches("^(1-0|0-1|1/2-1/2)$", move)) return;
-
-        if (isWhite) {
-
-        } else {
-
-        }
-    }
 }

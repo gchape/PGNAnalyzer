@@ -3,11 +3,13 @@ package io.github.gchape.view;
 import io.github.gchape.model.Model;
 import io.github.gchape.view.handlers.AnalyzeHandlers;
 import io.github.gchape.view.handlers.SelectFilesHandlers;
+import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -26,6 +28,9 @@ public class View {
     private final BorderPane root = new BorderPane();
     private final TextArea textArea = new TextArea();
     private final TreeView<String> treeView = new TreeView<>();
+
+    private final StringProperty textInput = new SimpleStringProperty("");
+
     private final Button analyze = new Button("Analyze");
     private final Button selectFiles = new Button("Select files");
 
@@ -42,10 +47,6 @@ public class View {
 
     public static View getInstance() {
         return INSTANCE;
-    }
-
-    public TextInputControl getTextArea() {
-        return textArea;
     }
 
     private <T> void configureControl(Class<T> controlClass, Consumer<T> configurer) {
@@ -88,11 +89,16 @@ public class View {
 
         analyze.disableProperty().bind(model.analyzeButtonDisabledProperty());
         selectFiles.disableProperty().bind(model.selectFilesButtonDisabledProperty());
+
+        textInput.bind(model.textInputProperty());
     }
 
     private void mapEventHandlers() {
         analyze.setOnMouseClicked(e -> analyzeHandlers.onMouseClicked(e));
         selectFiles.setOnMouseClicked(e -> selectFilesHandlers.onMouseClicked(e));
+
+        textInput.addListener((__0, __1, newText) ->
+                Platform.runLater(() -> textArea.appendText(newText)));
     }
 
     private void composeView() {
