@@ -1,11 +1,13 @@
 package io.github.gchape.view;
 
 import io.github.gchape.model.Model;
-import io.github.gchape.view.handlers.MouseClickEvents;
+import io.github.gchape.view.handlers.AnalyzeHandlers;
+import io.github.gchape.view.handlers.SelectFilesHandlers;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -23,16 +25,17 @@ public class View {
     private final HBox topBar = new HBox();
     private final BorderPane root = new BorderPane();
     private final TextArea textArea = new TextArea();
-    private final FileChooser fileChooser = new FileChooser();
     private final TreeView<String> treeView = new TreeView<>();
     private final Button analyze = new Button("Analyze");
     private final Button selectFiles = new Button("Select files");
-    private MouseClickEvents eventHandlers;
+
+    private AnalyzeHandlers analyzeHandlers;
+    private SelectFilesHandlers selectFilesHandlers;
 
     private View() {
         composeView();
         configureStyle();
-        configureEvents();
+        mapEventHandlers();
         configureBindings();
         configureControls();
     }
@@ -41,7 +44,7 @@ public class View {
         return INSTANCE;
     }
 
-    public TextArea getTextArea() {
+    public TextInputControl getTextArea() {
         return textArea;
     }
 
@@ -61,13 +64,13 @@ public class View {
     }
 
     private void configureControls() {
-        configureControl(FileChooser.class, fc -> fc.getExtensionFilters().addFirst(
+        configureControl(FileChooser.class, __ -> __.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("*.pgn", "*.pgn")
         ));
 
-        configureControl(TextArea.class, ta -> {
-            ta.setWrapText(true);
-            ta.setEditable(false);
+        configureControl(TextArea.class, __ -> {
+            __.setWrapText(true);
+            __.setEditable(false);
         });
     }
 
@@ -87,9 +90,9 @@ public class View {
         selectFiles.disableProperty().bind(model.selectFilesButtonDisabledProperty());
     }
 
-    private void configureEvents() {
-        analyze.setOnMouseClicked(e -> eventHandlers.analyzeButton(e));
-        selectFiles.setOnMouseClicked(e -> eventHandlers.fileChooser(e, fileChooser));
+    private void mapEventHandlers() {
+        analyze.setOnMouseClicked(e -> analyzeHandlers.onMouseClicked(e));
+        selectFiles.setOnMouseClicked(e -> selectFilesHandlers.onMouseClicked(e));
     }
 
     private void composeView() {
@@ -122,7 +125,11 @@ public class View {
         return root;
     }
 
-    public void setEventHandlers(MouseClickEvents eventHandlers) {
-        this.eventHandlers = eventHandlers;
+    public void setAnalyzeHandlers(AnalyzeHandlers analyzeHandlers) {
+        this.analyzeHandlers = analyzeHandlers;
+    }
+
+    public void setSelectFilesHandlers(SelectFilesHandlers selectFilesHandlers) {
+        this.selectFilesHandlers = selectFilesHandlers;
     }
 }
