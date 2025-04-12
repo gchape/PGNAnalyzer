@@ -10,12 +10,12 @@ import java.util.Objects;
 
 public class Pgnalyze extends Application {
     public static void main(String[] args) {
-        launch();
+        launch(args);
     }
 
     @Override
     public void start(Stage stage) {
-        Scene scene = new Scene(Controller.root(), 650, 500);
+        Scene scene = new Scene(new Controller().root(), 650, 500);
         stage.setResizable(true);
         stage.setScene(scene);
 
