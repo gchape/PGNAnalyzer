@@ -41,6 +41,8 @@ public class Game implements Runnable {
                 tryCastle(isWhite, true);
             } else if (move.equals("0-0-0")) {
                 tryCastle(isWhite, false);
+            } else if (move.contains("=") && move.contains("x")) {
+                tryCaptureAndPromotion(isWhite, move);
             } else if (move.contains("=")) {
                 tryPromotion(isWhite, move);
             } else if (move.contains("x")) {
@@ -156,6 +158,40 @@ public class Game implements Runnable {
         pieces.get(promotedPiece).add(square);
     }
 
+    private void tryCaptureAndPromotion(boolean isWhite, String move) {
+        int x = move.indexOf('x');
+        int equalIndex = move.indexOf('=');
+
+        char from = move.charAt(0);
+        String to = move.substring(x + 1, equalIndex);
+        char promotedPieceSymbol = move.charAt(equalIndex + 1);
+
+        Piece promotedPiece;
+        try {
+            promotedPiece = Piece.of(promotedPieceSymbol);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid promotion piece in move '" + move + "'. Must be one of Q, R, B, N.");
+        }
+
+        Square targetSquare = new Square(to);
+        Map<Piece, Set<String>> startPieces = getPiecesByColor(isWhite);
+        Map<Piece, Set<String>> targetPieces = getPiecesByColor(!isWhite);
+
+        String fromRank = isWhite ? "7" : "2";
+        String fromSquare = from + fromRank;
+
+        if (!startPieces.get(Piece.PAWN).contains(fromSquare)) {
+            throw new IllegalStateException("No " + (isWhite ? "White" : "Black") +
+                    " pawn found at " + fromSquare + " to perform capture and promotion.");
+        }
+
+        for (Set<String> pieces : targetPieces.values()) {
+            pieces.remove(targetSquare.toChessNotation());
+        }
+
+        startPieces.get(Piece.PAWN).remove(fromSquare);
+        startPieces.get(promotedPiece).add(to);
+    }
 
     private String getPawnPositionForPromotion(boolean isWhite, String square) {
         if (isWhite) {
