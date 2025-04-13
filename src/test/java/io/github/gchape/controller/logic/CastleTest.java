@@ -120,7 +120,7 @@ class CastleTest {
         kingMovedField.setBoolean(game, true);
 
         IllegalStateException ex = assertThrows(IllegalStateException.class, () -> game.tryCastle(true, true));
-        assertEquals("Cannot castle! Either king or rook has moved!", ex.getMessage());
+        assertEquals("White cannot castle KingSide: either the king or rook has already moved.", ex.getMessage());
     }
 
     /**
@@ -134,6 +134,6 @@ class CastleTest {
         rookMovedField.setBoolean(game, true);
 
         IllegalStateException ex = assertThrows(IllegalStateException.class, () -> game.tryCastle(false, false));
-        assertEquals("Cannot castle! Either king or rook has moved!", ex.getMessage());
+        assertEquals("Black cannot castle QueenSide: either the king or rook has already moved.", ex.getMessage());
     }
 }

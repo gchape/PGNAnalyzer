@@ -125,12 +125,21 @@ public class Game implements Runnable {
     private void tryPromotion(boolean isWhite, String move) {
         String square = move.substring(0, 2);
         char promotedPieceSymbol = move.charAt(3);
-        Piece promotedPiece = Piece.of(promotedPieceSymbol);
+        Piece promotedPiece;
+
+        try {
+            promotedPiece = Piece.of(promotedPieceSymbol);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid promotion piece: '" + promotedPieceSymbol +
+                    "'. Must be one of Q, R, B, N.");
+        }
 
         if (isWhite && square.charAt(1) != '8') {
-            throw new IllegalArgumentException("White pawn must reach the 8th rank for promotion");
+            throw new IllegalArgumentException("Invalid promotion square '" + square +
+                    "' for White. Pawn must reach rank 8.");
         } else if (!isWhite && square.charAt(1) != '1') {
-            throw new IllegalArgumentException("Black pawn must reach the 1st rank for promotion");
+            throw new IllegalArgumentException("Invalid promotion square '" + square +
+                    "' for Black. Pawn must reach rank 1.");
         }
 
         Map<Piece, Set<String>> pieces = getPiecesByColor(isWhite);
@@ -138,14 +147,15 @@ public class Game implements Runnable {
         Set<String> pawns = pieces.get(Piece.PAWN);
 
         if (!pawns.contains(pawnPosition)) {
-            throw new IllegalStateException("No pawn found at " + pawnPosition + " to promote");
+            throw new IllegalStateException("No " + (isWhite ? "White" : "Black") +
+                    " pawn found at expected square '" + pawnPosition +
+                    "' to promote to " + promotedPiece + ".");
         }
 
         pawns.remove(pawnPosition);
         pieces.get(promotedPiece).add(square);
-
-        System.out.println("Pawn promoted to " + promotedPiece + " on " + square);
     }
+
 
     private String getPawnPositionForPromotion(boolean isWhite, String square) {
         if (isWhite) {
@@ -164,15 +174,11 @@ public class Game implements Runnable {
                 .stream()
                 .map(Square::new)
                 .filter(startSquare -> isValidMove(startSquare, targetSquare, piece))
-                .filter(startSquare -> {
-                    if (disambiguation != null) {
-                        return startSquare.toChessNotation().contains(disambiguation);
-                    } else {
-                        return true;
-                    }
-                })
+                .filter(startSquare -> disambiguation == null || startSquare.toChessNotation().contains(disambiguation))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Can not find " + piece + " to capture piece at " + targetSquare.toChessNotation()));
+                .orElseThrow(() -> new IllegalStateException("Cannot find a valid " + piece +
+                        " to move to " + targetSquare.toChessNotation() +
+                        (disambiguation != null ? " with disambiguation '" + disambiguation + "'" : "") + "."));
     }
 
     private void moveAndCapturePiece(Map<Piece, Set<String>> startPieces, Map<Piece, Set<String>> targetPieces,
@@ -223,12 +229,17 @@ public class Game implements Runnable {
     }
 
     public void tryCastle(boolean isWhite, boolean kingSide) {
+        String side = isWhite ? "White" : "Black";
+        String direction = kingSide ? "KingSide" : "QueenSide";
+
         if (kingMoved || rookMoved) {
-            throw new IllegalStateException("Cannot castle! Either king or rook has moved!");
+            throw new IllegalStateException(side + " cannot castle " + direction +
+                    ": either the king or rook has already moved.");
         }
 
         if (!isVacant(isWhite, kingSide)) {
-            throw new IllegalStateException("Cannot castle! Squares between the king and rook are not vacant!");
+            throw new IllegalStateException(side + " cannot castle " + direction +
+                    ": squares between king and rook are not vacant.");
         }
 
         Map<String, String[]> castlingSquares = Map.of(
@@ -238,7 +249,7 @@ public class Game implements Runnable {
                 "BlackQueenSide", new String[]{"e8", "c8", "a8", "d8"}
         );
 
-        String key = (isWhite ? "White" : "Black") + (kingSide ? "KingSide" : "QueenSide");
+        String key = (side) + (direction);
         String[] squares = castlingSquares.get(key);
 
         Map<Piece, Set<String>> pieces = isWhite ? board.getWhitePieces() : board.getBlackPieces();
@@ -248,7 +259,6 @@ public class Game implements Runnable {
         pieces.get(Piece.ROOK).remove(squares[2]);
         pieces.get(Piece.ROOK).add(squares[3]);
     }
-
 
     private boolean isVacant(boolean isWhite, boolean kingSide) {
         Map<String, List<String>> vacantSquares = Map.of(

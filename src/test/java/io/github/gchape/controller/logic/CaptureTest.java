@@ -120,7 +120,7 @@ class CaptureTest {
 
         var ex = assertThrows(Exception.class, () -> tryCapture.invoke(game, true, "Kxf6"));
         assertInstanceOf(IllegalStateException.class, ex.getCause());
-        assertEquals("Can not find KING to capture piece at f6", ex.getCause().getMessage());
+        assertEquals("Cannot find a valid KING to move to f6.", ex.getCause().getMessage());
     }
 
     /**

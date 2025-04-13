@@ -87,7 +87,7 @@ class PromotionTest {
         Throwable cause = thrown.getCause();
 
         assertInstanceOf(IllegalArgumentException.class, cause);
-        assertEquals("White pawn must reach the 8th rank for promotion", cause.getMessage());
+        assertEquals("Invalid promotion square 'e6' for White. Pawn must reach rank 8.", cause.getMessage());
     }
 
     /**
@@ -105,7 +105,7 @@ class PromotionTest {
         Throwable cause = thrown.getCause();
 
         assertInstanceOf(IllegalArgumentException.class, cause);
-        assertEquals("Black pawn must reach the 1st rank for promotion", cause.getMessage());
+        assertEquals("Invalid promotion square 'e3' for Black. Pawn must reach rank 1.", cause.getMessage());
     }
 
     /**
@@ -125,6 +125,6 @@ class PromotionTest {
         System.out.println("Exception Message: " + cause.getMessage());
 
         assertInstanceOf(IllegalArgumentException.class, cause, "Expected IllegalArgumentException, but got " + cause.getClass().getName());
-        assertEquals("White pawn must reach the 8th rank for promotion", cause.getMessage());
+        assertEquals("Invalid promotion square 'e7' for White. Pawn must reach rank 8.", cause.getMessage());
     }
 }
