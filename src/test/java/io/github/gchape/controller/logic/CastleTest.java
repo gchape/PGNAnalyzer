@@ -11,7 +11,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class GameTest {
+class CastleTest {
 
     private Game game;
 
@@ -40,6 +40,10 @@ class GameTest {
         rookMovedField.setBoolean(game, false);
     }
 
+    /**
+     * Test that white king-side castling works successfully.
+     * The white king moves from e1 to g1, and the white rook moves from h1 to f1.
+     */
     @Test
     void whiteKingSideCastle_shouldSucceed() throws Exception {
         game.tryCastle(true, true);
@@ -54,6 +58,10 @@ class GameTest {
         assertFalse(board.getWhitePieces().get(Piece.ROOK).contains("h1"));
     }
 
+    /**
+     * Test that white queen-side castling works successfully.
+     * The white king moves from e1 to c1, and the white rook moves from a1 to d1.
+     */
     @Test
     void whiteQueenSideCastle_shouldSucceed() throws Exception {
         game.tryCastle(true, false);
@@ -68,6 +76,10 @@ class GameTest {
         assertFalse(board.getWhitePieces().get(Piece.ROOK).contains("a1"));
     }
 
+    /**
+     * Test that black king-side castling works successfully.
+     * The black king moves from e8 to g8, and the black rook moves from h8 to f8.
+     */
     @Test
     void blackKingSideCastle_shouldSucceed() throws Exception {
         game.tryCastle(false, true);
@@ -80,6 +92,10 @@ class GameTest {
         assertTrue(board.getBlackPieces().get(Piece.ROOK).contains("f8"));
     }
 
+    /**
+     * Test that black queen-side castling works successfully.
+     * The black king moves from e8 to c8, and the black rook moves from a8 to d8.
+     */
     @Test
     void blackQueenSideCastle_shouldSucceed() throws Exception {
         game.tryCastle(false, false);
@@ -92,6 +108,10 @@ class GameTest {
         assertTrue(board.getBlackPieces().get(Piece.ROOK).contains("d8"));
     }
 
+    /**
+     * Test that castling fails if the white king has already moved.
+     * An IllegalStateException is thrown with an appropriate error message.
+     */
     @Test
     void castle_shouldFail_ifKingMoved() throws Exception {
         Field kingMovedField = Game.class.getDeclaredField("kingMoved");
@@ -102,6 +122,10 @@ class GameTest {
         assertEquals("Cannot castle! Either king or rook has moved!", ex.getMessage());
     }
 
+    /**
+     * Test that castling fails if the white rook has already moved.
+     * An IllegalStateException is thrown with an appropriate error message.
+     */
     @Test
     void castle_shouldFail_ifRookMoved() throws Exception {
         Field rookMovedField = Game.class.getDeclaredField("rookMoved");
