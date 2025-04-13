@@ -12,6 +12,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
 class CaptureTest {
 
     private Game game;
@@ -141,5 +142,20 @@ class CaptureTest {
 
         assertTrue(board.getWhitePieces().get(Piece.ROOK).contains("h8"));
         assertFalse(board.getBlackPieces().get(Piece.KNIGHT).contains("h8"));
+    }
+
+    /**
+     * Test that a black pawn can successfully capture a white pawn via en passant.
+     * The black pawn moves from d5 to e6, capturing a white pawn on e5 via en passant.
+     */
+    @Test
+    void blackPawnCaptureEnPassant_shouldSucceed() throws Exception {
+        board.getWhitePieces().put(Piece.PAWN, new HashSet<>(Set.of("e5")));
+        board.getBlackPieces().put(Piece.PAWN, new HashSet<>(Set.of("d5")));
+
+        tryCapture.invoke(game, false, "d5xe6");
+
+        assertTrue(board.getBlackPieces().get(Piece.PAWN).contains("e6"));
+        assertFalse(board.getWhitePieces().get(Piece.PAWN).contains("e5"));
     }
 }

@@ -41,6 +41,8 @@ public class Game implements Runnable {
                 tryCastle(isWhite, true);
             } else if (move.equals("0-0-0")) {
                 tryCastle(isWhite, false);
+            } else if (move.contains("=")) {
+                tryPromotion(isWhite, move);
             } else if (move.contains("x")) {
                 tryCapture(isWhite, move);
             } else {
@@ -104,6 +106,52 @@ public class Game implements Runnable {
 
                 moveAndCapturePiece(startPieces, targetPieces, startSquare, targetSquare, Piece.KNIGHT);
             }
+            case PAWN -> {
+                var startPieces = getPiecesByColor(isWhite);
+                var targetPieces = getPiecesByColor(!isWhite);
+
+                var targetSquare = new Square(to);
+                Square startSquare = getPieceSquare(startPieces, Piece.PAWN, targetSquare, move.substring(0, move.indexOf('x')));
+
+                if (isEnPassant(startSquare, targetSquare, isWhite)) {
+                    enPassantCapture(startPieces, targetPieces, startSquare, targetSquare);
+                } else {
+                    moveAndCapturePiece(startPieces, targetPieces, startSquare, targetSquare, Piece.PAWN);
+                }
+            }
+        }
+    }
+
+    private void tryPromotion(boolean isWhite, String move) {
+        String square = move.substring(0, 2);
+        char promotedPieceSymbol = move.charAt(3);
+        Piece promotedPiece = Piece.of(promotedPieceSymbol);
+
+        if (isWhite && square.charAt(1) != '8') {
+            throw new IllegalArgumentException("White pawn must reach the 8th rank for promotion");
+        } else if (!isWhite && square.charAt(1) != '1') {
+            throw new IllegalArgumentException("Black pawn must reach the 1st rank for promotion");
+        }
+
+        Map<Piece, Set<String>> pieces = getPiecesByColor(isWhite);
+        String pawnPosition = getPawnPositionForPromotion(isWhite, square);
+        Set<String> pawns = pieces.get(Piece.PAWN);
+
+        if (!pawns.contains(pawnPosition)) {
+            throw new IllegalStateException("No pawn found at " + pawnPosition + " to promote");
+        }
+
+        pawns.remove(pawnPosition);
+        pieces.get(promotedPiece).add(square);
+
+        System.out.println("Pawn promoted to " + promotedPiece + " on " + square);
+    }
+
+    private String getPawnPositionForPromotion(boolean isWhite, String square) {
+        if (isWhite) {
+            return square.charAt(0) + "7";
+        } else {
+            return square.charAt(0) + "2";
         }
     }
 
@@ -137,21 +185,41 @@ public class Game implements Runnable {
         }
     }
 
-    private boolean isValidMove(Square startSquare, Square targetSquare, Piece piece) {
-        switch (piece) {
-            case KING:
-                return startSquare.isKingMoveTo(targetSquare);
-            case QUEEN:
-                return startSquare.isQueenMoveTo(targetSquare);
-            case BISHOP:
-                return startSquare.isBishopMoveTo(targetSquare);
-            case ROOK:
-                return startSquare.isRookMoveTo(targetSquare);
-            case KNIGHT:
-                return startSquare.isKnightMoveTo(targetSquare);
-            default:
-                throw new IllegalStateException("Unsupported piece type: " + piece);
+    private boolean isEnPassant(Square startSquare, Square targetSquare, boolean isWhite) {
+        int dx = targetSquare.x() - startSquare.x();
+        int dy = targetSquare.y() - startSquare.y();
+
+        if (Math.abs(dx) == 1 && dy == (isWhite ? -1 : 1)) {
+            Square capturedSquare = new Square(targetSquare.x(), startSquare.y());
+
+            if (isWhite) {
+                return board.getBlackPieces().get(Piece.PAWN).contains(capturedSquare.toChessNotation());
+            } else {
+                return board.getWhitePieces().get(Piece.PAWN).contains(capturedSquare.toChessNotation());
+            }
         }
+
+        return false;
+    }
+
+    private void enPassantCapture(Map<Piece, Set<String>> startPieces, Map<Piece, Set<String>> targetPieces, Square startSquare, Square targetSquare) {
+        Square capturedSquare = new Square(targetSquare.x(), startSquare.y());
+
+        var opponentPieces = targetPieces.get(Piece.PAWN);
+        opponentPieces.remove(capturedSquare.toChessNotation());
+
+        moveAndCapturePiece(startPieces, targetPieces, startSquare, targetSquare, Piece.PAWN);
+    }
+
+    private boolean isValidMove(Square startSquare, Square targetSquare, Piece piece) {
+        return switch (piece) {
+            case KING -> startSquare.isKingMoveTo(targetSquare);
+            case QUEEN -> startSquare.isQueenMoveTo(targetSquare);
+            case BISHOP -> startSquare.isBishopMoveTo(targetSquare);
+            case ROOK -> startSquare.isRookMoveTo(targetSquare);
+            case KNIGHT -> startSquare.isKnightMoveTo(targetSquare);
+            case PAWN -> startSquare.isPawnMoveTo(targetSquare);
+        };
     }
 
     public void tryCastle(boolean isWhite, boolean kingSide) {
