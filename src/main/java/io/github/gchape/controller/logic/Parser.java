@@ -69,7 +69,7 @@ public class Parser {
                 if (line.contains("[")) {
                     header.append(line);
                 } else if (!line.isBlank()) {
-                    body.append(line);
+                    body.append(line).append(" ");
                 } else {
                     if (!header.isEmpty()) {
                         headers.add(new StringBuilder(header));

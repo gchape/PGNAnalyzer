@@ -35,20 +35,27 @@ public record Square(int x, int y) {
         return dy <= 1 && dx <= 1 && (dy + dx != 0);
     }
 
-    public boolean isPawnMoveTo(Square other) {
+    public boolean isPawnMoveTo(Square other, boolean isWhite) {
         int dx = other.x - x;
         int dy = other.y - y;
 
-        if (dx == 0 && Math.abs(dy) == 1) {
-            return true;
+        if (isWhite) {
+            if (dx == 0 && dy == 1) return true;
+            return dx == 0 && dy == 2 && y == 2;
+        } else {
+            if (dx == 0 && dy == -1) return true;
+            return dx == 0 && dy == -2 && y == 7;
         }
+    }
 
-        if (dx == 0 && Math.abs(dy) == 2) {
-            if (y == 1 || y == 6) {
-                return true;
-            }
+    public boolean isPawnCaptureTo(Square other, boolean isWhite) {
+        int dx = other.x - x;
+        int dy = other.y - y;
+
+        if (isWhite) {
+            return Math.abs(dx) == 1 && dy == 1;
+        } else {
+            return Math.abs(dx) == 1 && dy == -1;
         }
-
-        return Math.abs(dx) == 1 && Math.abs(dy) == 1;
     }
 }

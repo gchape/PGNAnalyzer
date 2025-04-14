@@ -97,8 +97,7 @@ public class View {
         analyze.setOnMouseClicked(e -> analyzeHandlers.onMouseClicked(e));
         selectFiles.setOnMouseClicked(e -> selectFilesHandlers.onMouseClicked(e));
 
-        textInput.addListener((__0, __1, newText) ->
-                Platform.runLater(() -> textArea.appendText(newText)));
+        textInput.addListener((__0, __1, newText) -> textArea.appendText(newText));
     }
 
     private void composeView() {
