@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class Printer {
     private static final Printer INSTANCE = new Printer();
-    private final static StringProperty textInput = Model.getInstance().textInputProperty();
+    private final static StringProperty textInput = Model.INSTANCE.textInputProperty();
 
     private Printer() {
     }

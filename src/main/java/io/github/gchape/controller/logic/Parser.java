@@ -62,8 +62,7 @@ public class Parser {
     }
 
     private void readLines(File file, StringBuilder header, StringBuilder body,
-                           List<StringBuilder> headers,
-                           List<StringBuilder> moves) {
+                           List<StringBuilder> headers, List<StringBuilder> moves) {
         try {
             Files.readAllLines(file.toPath()).forEach(line -> {
                 if (line.contains("[")) {

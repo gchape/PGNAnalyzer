@@ -3,7 +3,6 @@ package io.github.gchape.view;
 import io.github.gchape.model.Model;
 import io.github.gchape.view.handlers.AnalyzeHandlers;
 import io.github.gchape.view.handlers.SelectFilesHandlers;
-import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
@@ -15,14 +14,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.stage.FileChooser;
 
-import java.lang.reflect.Field;
-import java.util.function.Consumer;
+public enum View {
+    INSTANCE;
 
-public class View {
-    private static final View INSTANCE = new View();
-    private final Model model = Model.getInstance();
+    private final Model model = Model.INSTANCE;
 
     private final HBox topBar = new HBox();
     private final BorderPane root = new BorderPane();
@@ -37,7 +33,7 @@ public class View {
     private AnalyzeHandlers analyzeHandlers;
     private SelectFilesHandlers selectFilesHandlers;
 
-    private View() {
+    View() {
         composeView();
         configureStyle();
         mapEventHandlers();
@@ -45,34 +41,12 @@ public class View {
         configureControls();
     }
 
-    public static View getInstance() {
-        return INSTANCE;
-    }
-
-    private <T> void configureControl(Class<T> controlClass, Consumer<T> configurer) {
-        for (Field field : getClass().getDeclaredFields()) {
-            if (controlClass.isAssignableFrom(field.getType())) {
-                field.setAccessible(true);
-
-                try {
-                    T instance = controlClass.cast(field.get(this));
-                    configurer.accept(instance);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException("Failed to configure " + controlClass.getSimpleName(), e);
-                }
-            }
-        }
-    }
-
     private void configureControls() {
-        configureControl(FileChooser.class, __ -> __.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("*.pgn", "*.pgn")
-        ));
-
-        configureControl(TextArea.class, __ -> {
-            __.setWrapText(true);
-            __.setEditable(false);
-        });
+        // TextArea
+        {
+            textArea.setWrapText(true);
+            textArea.setEditable(false);
+        }
     }
 
     private void configureStyle() {

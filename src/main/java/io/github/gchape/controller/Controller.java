@@ -14,13 +14,15 @@ import java.io.File;
 import java.util.Spliterators;
 import java.util.stream.StreamSupport;
 
-public class Controller {
+public enum Controller {
+    INSTANCE;
+
     private final View view;
     private final Model model;
 
-    public Controller() {
-        view = View.getInstance();
-        model = Model.getInstance();
+    Controller() {
+        view = View.INSTANCE;
+        model = Model.INSTANCE;
 
         model.selectedFilesProperty().addListener((__0, __1, newFiles) -> updateFileTree(newFiles));
         view.setSelectFilesHandlers(this::selectFilesClickAction);

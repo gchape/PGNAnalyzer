@@ -7,8 +7,8 @@ import javafx.scene.control.TreeItem;
 
 import java.io.File;
 
-public class Model {
-    private final static Model INSTANCE = new Model();
+public enum Model {
+    INSTANCE;
 
     private final StringProperty textInput;
     private final ListProperty<File> selectedFiles;
@@ -17,7 +17,7 @@ public class Model {
     private final BooleanProperty analyzeButtonDisabled;
     private final BooleanProperty selectFilesButtonDisabled;
 
-    private Model() {
+    Model() {
         fileTree = new SimpleObjectProperty<>(new TreeItem<>());
         selectedFiles = new SimpleListProperty<>(FXCollections.observableArrayList());
 
@@ -25,10 +25,6 @@ public class Model {
         selectFilesButtonDisabled = new SimpleBooleanProperty(false);
 
         textInput = new SimpleStringProperty("");
-    }
-
-    public static Model getInstance() {
-        return INSTANCE;
     }
 
     public ObservableList<File> getSelectedFiles() {

@@ -15,7 +15,7 @@ public class Pgnalyze extends Application {
 
     @Override
     public void start(Stage stage) {
-        Scene scene = new Scene(new Controller().root(), 650, 500);
+        Scene scene = new Scene(Controller.INSTANCE.root(), 650, 500);
         stage.setResizable(true);
         stage.setScene(scene);
 
