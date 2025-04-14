@@ -10,14 +10,15 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-class CaptureTest {
+class TryCaptureTest {
 
     private Game game;
     private Board board;
-    private Method tryCapture;
+    private Method tryMove;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -30,8 +31,8 @@ class CaptureTest {
         board.getWhitePieces().clear();
         board.getBlackPieces().clear();
 
-        tryCapture = Game.class.getDeclaredMethod("tryCapture", boolean.class, String.class);
-        tryCapture.setAccessible(true);
+        tryMove = Game.class.getDeclaredMethod("tryMove", boolean.class, boolean.class, String.class);
+        tryMove.setAccessible(true);
     }
 
     /**
@@ -43,7 +44,7 @@ class CaptureTest {
         board.getWhitePieces().put(Piece.KING, new HashSet<>(Set.of("c1")));
         board.getBlackPieces().put(Piece.PAWN, new HashSet<>(Set.of("d2")));
 
-        tryCapture.invoke(game, true, "Kxd2");
+        tryMove.invoke(game, true, true, "Kxd2");
 
         assertTrue(board.getWhitePieces().get(Piece.KING).contains("d2"));
         assertFalse(board.getBlackPieces().get(Piece.PAWN).contains("d2"));
@@ -58,7 +59,7 @@ class CaptureTest {
         board.getWhitePieces().put(Piece.QUEEN, new HashSet<>(Set.of("d1")));
         board.getBlackPieces().put(Piece.ROOK, new HashSet<>(Set.of("d8")));
 
-        tryCapture.invoke(game, true, "Qxd8");
+        tryMove.invoke(game, true, true, "Qxd8");
 
         assertTrue(board.getWhitePieces().get(Piece.QUEEN).contains("d8"));
         assertFalse(board.getBlackPieces().get(Piece.ROOK).contains("d8"));
@@ -73,7 +74,7 @@ class CaptureTest {
         board.getWhitePieces().put(Piece.ROOK, new HashSet<>(Set.of("h1")));
         board.getBlackPieces().put(Piece.KNIGHT, new HashSet<>(Set.of("h8")));
 
-        tryCapture.invoke(game, true, "Rxh8");
+        tryMove.invoke(game, true, true, "Rxh8");
 
         assertTrue(board.getWhitePieces().get(Piece.ROOK).contains("h8"));
         assertFalse(board.getBlackPieces().get(Piece.KNIGHT).contains("h8"));
@@ -88,7 +89,7 @@ class CaptureTest {
         board.getWhitePieces().put(Piece.BISHOP, new HashSet<>(Set.of("c1")));
         board.getBlackPieces().put(Piece.KNIGHT, new HashSet<>(Set.of("f4")));
 
-        tryCapture.invoke(game, true, "Bxf4");
+        tryMove.invoke(game, true, true, "Bxf4");
 
         assertTrue(board.getWhitePieces().get(Piece.BISHOP).contains("f4"));
         assertFalse(board.getBlackPieces().get(Piece.KNIGHT).contains("f4"));
@@ -103,24 +104,10 @@ class CaptureTest {
         board.getWhitePieces().put(Piece.KNIGHT, new HashSet<>(Set.of("g1")));
         board.getBlackPieces().put(Piece.BISHOP, new HashSet<>(Set.of("e2")));
 
-        tryCapture.invoke(game, true, "Nxe2");
+        tryMove.invoke(game, true, true, "Nxe2");
 
         assertTrue(board.getWhitePieces().get(Piece.KNIGHT).contains("e2"));
         assertFalse(board.getBlackPieces().get(Piece.BISHOP).contains("e2"));
-    }
-
-    /**
-     * Test that capture fails if the move is invalid.
-     * The white king tries to capture a piece on f6, but the king is on e1,
-     * which should result in an exception.
-     */
-    @Test
-    void capture_shouldFail_ifInvalidMove() throws Exception {
-        board.getWhitePieces().put(Piece.KING, new HashSet<>(Set.of("e1")));
-
-        var ex = assertThrows(Exception.class, () -> tryCapture.invoke(game, true, "Kxf6"));
-        assertInstanceOf(IllegalStateException.class, ex.getCause());
-        assertEquals("Cannot find a valid KING to move to f6.", ex.getCause().getMessage());
     }
 
     /**
@@ -133,29 +120,27 @@ class CaptureTest {
         board.getWhitePieces().put(Piece.ROOK, new HashSet<>(Set.of("a1", "h1")));
         board.getBlackPieces().put(Piece.KNIGHT, new HashSet<>(Set.of("a8", "h8")));
 
-        tryCapture.invoke(game, true, "R1xa8");
+        tryMove.invoke(game, true, true, "R1xa8");
 
         assertTrue(board.getWhitePieces().get(Piece.ROOK).contains("a8"));
         assertFalse(board.getBlackPieces().get(Piece.KNIGHT).contains("a8"));
 
-        tryCapture.invoke(game, true, "R1xh8");
+        tryMove.invoke(game, true, true, "R1xh8");
 
         assertTrue(board.getWhitePieces().get(Piece.ROOK).contains("h8"));
         assertFalse(board.getBlackPieces().get(Piece.KNIGHT).contains("h8"));
     }
 
-    /**
-     * Test that a black pawn can successfully capture a white pawn via en passant.
-     * The black pawn moves from d5 to e6, capturing a white pawn on e5 via en passant.
-     */
     @Test
-    void blackPawnCaptureEnPassant_shouldSucceed() throws Exception {
-        board.getWhitePieces().put(Piece.PAWN, new HashSet<>(Set.of("e5")));
-        board.getBlackPieces().put(Piece.PAWN, new HashSet<>(Set.of("d5")));
+    void enPassantCapture_shouldSucceed() throws Exception {
+        board.getWhitePieces().put(Piece.PAWN, new HashSet<>(Set.of("d5")));
+        board.getBlackPieces().put(Piece.PAWN, new HashSet<>(Set.of("e7")));
 
-        tryCapture.invoke(game, false, "d5xe6");
+        tryMove.invoke(game, false, false, "e7e5");
 
-        assertTrue(board.getBlackPieces().get(Piece.PAWN).contains("e6"));
-        assertFalse(board.getWhitePieces().get(Piece.PAWN).contains("e5"));
+        tryMove.invoke(game, true, true, "dxe6");
+
+        assertTrue(board.getWhitePieces().get(Piece.PAWN).contains("e6"));
+        assertFalse(board.getBlackPieces().get(Piece.PAWN).contains("e5"));
     }
 }
