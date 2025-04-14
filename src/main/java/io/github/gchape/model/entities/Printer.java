@@ -6,18 +6,12 @@ import javafx.beans.property.StringProperty;
 
 import java.util.Map;
 
-public class Printer {
-    private static final Printer INSTANCE = new Printer();
+public enum Printer {
+    INSTANCE;
+
     private final static StringProperty textInput = Model.INSTANCE.textInputProperty();
 
-    private Printer() {
-    }
-
-    public static Printer getInstance() {
-        return INSTANCE;
-    }
-
-    private static void append(String text) {
+    private static void append(final String text) {
         Platform.runLater(() -> textInput.set(text));
     }
 
@@ -44,9 +38,9 @@ public class Printer {
     public void appendBody(final int id, final boolean isValid) {
         append("""
                 {
-                  Id: "%d",
-                  Valid: "%s"
-                }
+                   Id: "%d",
+                   Valid: "%s"
+                },
                 """.formatted(id, isValid));
     }
 }

@@ -27,10 +27,7 @@ public class Game implements Runnable {
 
     @Override
     public void run() {
-        Printer.getInstance().appendHead(headers);
-
-        System.out.println(headers);
-        System.out.println(moves);
+        Printer.INSTANCE.appendHead(headers);
 
         boolean isValid = true;
         boolean isWhite = false;
@@ -54,7 +51,7 @@ public class Game implements Runnable {
 
             throw new RuntimeException(e);
         } finally {
-            Printer.getInstance().appendBody(id.incrementAndGet(), isValid);
+            Printer.INSTANCE.appendBody(id.incrementAndGet(), isValid);
         }
     }
 
