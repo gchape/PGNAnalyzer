@@ -1,7 +1,8 @@
 package io.github.gchape.model.entities;
 
-import io.github.gchape.exceptions.InvalidPromotion;
-import io.github.gchape.exceptions.NotFoundPieceException;
+import io.github.gchape.exceptions.InvalidCastlingException;
+import io.github.gchape.exceptions.InvalidPromotionException;
+import io.github.gchape.exceptions.NoPieceFoundException;
 
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -60,7 +61,7 @@ public class Board {
         };
     }
 
-    private boolean isVacant(Square startSquare, Square targetSquare, Piece piece) {
+    private boolean isVacant(final Square startSquare, final Square targetSquare, final Piece piece) {
         Set<String> allOccupiedSquares = new HashSet<>();
         whitePieces.values().forEach(allOccupiedSquares::addAll);
         blackPieces.values().forEach(allOccupiedSquares::addAll);
@@ -96,7 +97,7 @@ public class Board {
                 .filter(startSquare -> disambiguation == null
                         || startSquare.toChessNotation().contains(disambiguation))
                 .findFirst()
-                .orElseThrow(() -> new NotFoundPieceException(piece, targetSquare.toChessNotation()));
+                .orElseThrow(() -> new NoPieceFoundException(piece, targetSquare.toChessNotation()));
     }
 
     public void move(final Map<Piece, Set<String>> currentPieces, final Square startSquare,
@@ -120,7 +121,7 @@ public class Board {
     public void tryCastle(final boolean isWhite, final boolean kingSide) {
         var side = isWhite ? "White" : "Black";
         var direction = kingSide ? "KingSide" : "QueenSide";
-        var squares = detectCasteType(isWhite, side, direction);
+        var squares = getCastleType(isWhite, side, direction);
 
         var currentPieces = isWhite ? whitePieces : blackPieces;
         currentPieces.get(Piece.KING).remove(squares[0]);
@@ -129,10 +130,10 @@ public class Board {
         currentPieces.get(Piece.ROOK).add(squares[3]);
     }
 
-    private String[] detectCasteType(boolean isWhite, String side, String direction) {
+    private String[] getCastleType(final boolean isWhite, final String side, final String direction) {
         if ((isWhite && whiteKingMoved || whiteRookMoved)
                 || (!isWhite && blackKingMoved || blackRookMoved)) {
-            throw new IllegalStateException(side + " cannot castle " + direction + ": either the king or rook has already moved.");
+            throw new InvalidCastlingException(side, direction);
         }
 
         var castlingSquares = Map.of("WhiteKingSide", new String[]{"e1", "g1", "h1", "f1"}, "WhiteQueenSide", new String[]{"e1", "c1", "a1", "d1"}, "BlackKingSide", new String[]{"e8", "g8", "h8", "f8"}, "BlackQueenSide", new String[]{"e8", "c8", "a8", "d8"});
@@ -145,12 +146,10 @@ public class Board {
         var currentPieces = isWhite ? whitePieces : blackPieces;
         var pawnPosition = isWhite ? square.charAt(0) + "7" : square.charAt(0) + "2";
 
-        if (isWhite && square.charAt(1) != '8') {
-            throw new InvalidPromotion("Invalid promotion square '" + square + "' for White. Pawn must reach rank 8.");
-        } else if (!isWhite && square.charAt(1) != '1') {
-            throw new InvalidPromotion("Invalid promotion square '" + square + "' for Black. Pawn must reach rank 1.");
+        if (isWhite && square.charAt(1) != '8' || !isWhite && square.charAt(1) != '1') {
+            throw new InvalidPromotionException(square);
         } else if (!currentPieces.get(Piece.PAWN).contains(pawnPosition)) {
-            throw new NotFoundPieceException(Piece.PAWN, pawnPosition);
+            throw new NoPieceFoundException(Piece.PAWN, pawnPosition);
         }
 
         currentPieces.get(piece).add(square);

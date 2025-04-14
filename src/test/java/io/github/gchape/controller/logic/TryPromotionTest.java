@@ -1,7 +1,7 @@
 package io.github.gchape.controller.logic;
 
-import io.github.gchape.exceptions.InvalidPromotion;
-import io.github.gchape.exceptions.NotFoundPieceException;
+import io.github.gchape.exceptions.InvalidPromotionException;
+import io.github.gchape.exceptions.NoPieceFoundException;
 import io.github.gchape.model.entities.Board;
 import io.github.gchape.model.entities.Piece;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,7 +54,7 @@ class TryPromotionTest {
     @Test
     public void testInvalidWhitePromotionRank() {
         String move = "a7=Q";
-        assertThrows(InvalidPromotion.class, () -> board.tryPromotion(true, move));
+        assertThrows(InvalidPromotionException.class, () -> board.tryPromotion(true, move));
     }
 
     /**
@@ -64,7 +64,7 @@ class TryPromotionTest {
     @Test
     public void testInvalidBlackPromotionRank() {
         String move = "a2=Q";
-        assertThrows(InvalidPromotion.class, () -> board.tryPromotion(false, move));
+        assertThrows(InvalidPromotionException.class, () -> board.tryPromotion(false, move));
     }
 
     /**
@@ -74,7 +74,7 @@ class TryPromotionTest {
     @Test
     public void testNoPawnAtExpectedPosition() {
         String move = "a8=Q";
-        assertThrows(NotFoundPieceException.class, () -> board.tryPromotion(true, move));
+        assertThrows(NoPieceFoundException.class, () -> board.tryPromotion(true, move));
     }
 
     /**
@@ -84,6 +84,6 @@ class TryPromotionTest {
     @Test
     public void testInvalidPromotionPiece() {
         String move = "a7=R";
-        assertThrows(InvalidPromotion.class, () -> board.tryPromotion(true, move));
+        assertThrows(InvalidPromotionException.class, () -> board.tryPromotion(true, move));
     }
 }

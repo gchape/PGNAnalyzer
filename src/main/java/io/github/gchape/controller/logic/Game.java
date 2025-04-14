@@ -55,7 +55,7 @@ public class Game implements Runnable {
         }
     }
 
-    private void tryMove(boolean isWhite, boolean isCapture, String move) {
+    private void tryMove(final boolean isWhite, final boolean isCapture, final String move) {
         final var currentPieces = isWhite ? board.getWhitePieces() : board.getBlackPieces();
         final var opponentPieces = isWhite ? board.getBlackPieces() : board.getWhitePieces();
 
@@ -91,7 +91,7 @@ public class Game implements Runnable {
         }
     }
 
-    private void tryCaptureAndPromotion(boolean isWhite, String move) {
+    private void tryCaptureAndPromotion(final boolean isWhite, final String move) {
         final int i = move.indexOf('x'); // bxa1=Q
         final int j = move.indexOf('=');
 
