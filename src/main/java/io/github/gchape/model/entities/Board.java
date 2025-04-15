@@ -128,11 +128,19 @@ public class Board {
         currentPieces.get(Piece.KING).add(squares[1]);
         currentPieces.get(Piece.ROOK).remove(squares[2]);
         currentPieces.get(Piece.ROOK).add(squares[3]);
+
+        if (isWhite) {
+            whiteRookMoved = true;
+            whiteKingMoved = true;
+        } else {
+            blackRookMoved = true;
+            blackKingMoved = true;
+        }
     }
 
     private String[] getCastleType(final boolean isWhite, final String side, final String direction) {
-        if ((isWhite && whiteKingMoved || whiteRookMoved)
-                || (!isWhite && blackKingMoved || blackRookMoved)) {
+        if ((isWhite && (whiteKingMoved || whiteRookMoved))
+                || (!isWhite && (blackKingMoved || blackRookMoved))) {
             throw new InvalidCastlingException(side, direction);
         }
 

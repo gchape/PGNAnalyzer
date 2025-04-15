@@ -58,14 +58,14 @@ public class Game implements Runnable {
     private void tryMove(final boolean isWhite, final boolean isCapture, final String move) {
         final var currentPieces = isWhite ? board.getWhitePieces() : board.getBlackPieces();
         final var opponentPieces = isWhite ? board.getBlackPieces() : board.getWhitePieces();
-
         var piece = Piece.of(move.charAt(0));
+
         if (isCapture) {
-            var targetSquare = new Square(move.substring(move.indexOf('x') + 1, move.indexOf('x') + 3));
+            var targetSquare = new Square(move.substring(move.indexOf('x') + 1));
             var disambiguation = move.indexOf('x') - 1 == 0 ? null : move.substring(1, move.indexOf('x'));
 
             if (piece == Piece.PAWN) {
-                Square startSquare = board.findPiece(Piece.PAWN, targetSquare, move.substring(0, move.indexOf('x')), isWhite, true);
+                Square startSquare = board.findPiece(Piece.PAWN, targetSquare, move.substring(0, 1), isWhite, true);
 
                 if (isEnPassant(startSquare, targetSquare, isWhite)) {
                     currentPieces.get(Piece.PAWN).remove(startSquare.toChessNotation());

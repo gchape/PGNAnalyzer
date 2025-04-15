@@ -53,7 +53,7 @@ public enum View {
         root.getStyleClass().add("root-pane");
         topBar.getStyleClass().add("top-bar");
 
-        treeView.setPrefWidth(105);
+        treeView.setPrefWidth(110);
 
         BorderPane.setMargin(textArea, new Insets(0, 0, 0, 10));
     }
@@ -104,11 +104,11 @@ public enum View {
         return root;
     }
 
-    public void setAnalyzeHandlers(AnalyzeHandlers analyzeHandlers) {
+    public void setAnalyzeHandlers(final AnalyzeHandlers analyzeHandlers) {
         this.analyzeHandlers = analyzeHandlers;
     }
 
-    public void setSelectFilesHandlers(SelectFilesHandlers selectFilesHandlers) {
+    public void setSelectFilesHandlers(final SelectFilesHandlers selectFilesHandlers) {
         this.selectFilesHandlers = selectFilesHandlers;
     }
 }
