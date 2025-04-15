@@ -9,6 +9,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * The {@code Game} class represents a chess game and its logic.
+ * It is responsible for processing chess moves, validating them,
+ * updating the game state, and printing the game record.
+ * It implements the {@link Runnable} interface to run the game moves in a separate thread.
+ */
 public class Game implements Runnable {
     private final Board board;
     private final String moves;
@@ -18,6 +24,12 @@ public class Game implements Runnable {
 
     private Square lastDoubleStepPawnSquare = null;
 
+    /**
+     * Constructs a new {@code Game} instance with the provided headers and moves.
+     *
+     * @param headers A map of headers containing game metadata.
+     * @param moves   A string of chess moves in algebraic notation.
+     */
     public Game(final Map<String, String> headers, final String moves) {
         this.moves = moves;
         this.headers = headers;
@@ -25,6 +37,10 @@ public class Game implements Runnable {
         this.board = new Board();
     }
 
+    /**
+     * Runs the game by processing each move in the provided move sequence.
+     * It validates moves, handles castling, captures, promotions, and updates the game state.
+     */
     @Override
     public void run() {
         Printer.INSTANCE.appendHead(headers);
@@ -55,6 +71,14 @@ public class Game implements Runnable {
         }
     }
 
+    /**
+     * Tries to move a piece based on the move string.
+     * It handles piece movement, captures, and checks for special cases like en passant.
+     *
+     * @param isWhite   Indicates if the move is for the white player.
+     * @param isCapture Indicates if the move is a capture.
+     * @param move      The chess move in algebraic notation.
+     */
     private void tryMove(final boolean isWhite, final boolean isCapture, final String move) {
         final var currentPieces = isWhite ? board.getWhitePieces() : board.getBlackPieces();
         final var opponentPieces = isWhite ? board.getBlackPieces() : board.getWhitePieces();
@@ -91,6 +115,12 @@ public class Game implements Runnable {
         }
     }
 
+    /**
+     * Handles pawn capture and promotion, typically for moves like "bxa1=Q".
+     *
+     * @param isWhite Indicates if the move is for the white player.
+     * @param move    The move string in algebraic notation.
+     */
     private void tryCaptureAndPromotion(final boolean isWhite, final String move) {
         final int i = move.indexOf('x'); // bxa1=Q
         final int j = move.indexOf('=');
@@ -104,6 +134,15 @@ public class Game implements Runnable {
         currentPieces.get(Piece.of(move.charAt(j + 1))).add(pawnSquare);
     }
 
+    /**
+     * Captures an opponent's piece by updating the board and removing the piece from the opponent's set of pieces.
+     *
+     * @param startPieces    The current player's pieces.
+     * @param targetPieces   The opponent's pieces.
+     * @param startSquare    The starting square of the piece.
+     * @param targetSquare   The target square of the piece.
+     * @param piece          The type of the piece being moved.
+     */
     private void capturePiece(final Map<Piece, Set<String>> startPieces, final Map<Piece, Set<String>> targetPieces,
                               final Square startSquare, final Square targetSquare, final Piece piece) {
         startPieces.get(piece).remove(startSquare.toChessNotation());
@@ -112,6 +151,14 @@ public class Game implements Runnable {
         targetPieces.values().forEach(squares -> squares.remove(targetSquare.toChessNotation()));
     }
 
+    /**
+     * Checks if a move is an en passant capture.
+     *
+     * @param startSquare   The starting square of the pawn.
+     * @param targetSquare  The target square of the pawn.
+     * @param isWhite       Indicates if the move is for the white player.
+     * @return {@code true} if the move is an en passant capture, {@code false} otherwise.
+     */
     private boolean isEnPassant(final Square startSquare, final Square targetSquare, final boolean isWhite) {
         final int dx = targetSquare.x() - startSquare.x();
         final int dy = targetSquare.y() - startSquare.y();
