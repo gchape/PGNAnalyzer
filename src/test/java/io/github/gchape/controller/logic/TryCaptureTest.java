@@ -18,7 +18,7 @@ class TryCaptureTest {
 
     private Game game;
     private Board board;
-    private Method tryMove;
+    private Method tryCapture;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -31,8 +31,8 @@ class TryCaptureTest {
         board.getWhitePieces().clear();
         board.getBlackPieces().clear();
 
-        tryMove = Game.class.getDeclaredMethod("tryMove", boolean.class, boolean.class, String.class);
-        tryMove.setAccessible(true);
+        tryCapture = Game.class.getDeclaredMethod("tryCapture", boolean.class, String.class);
+        tryCapture.setAccessible(true);
     }
 
     /**
@@ -44,7 +44,7 @@ class TryCaptureTest {
         board.getWhitePieces().put(Piece.KING, new HashSet<>(Set.of("c1")));
         board.getBlackPieces().put(Piece.PAWN, new HashSet<>(Set.of("d2")));
 
-        tryMove.invoke(game, true, true, "Kxd2");
+        tryCapture.invoke(game, true, "Kxd2");
 
         assertTrue(board.getWhitePieces().get(Piece.KING).contains("d2"));
         assertFalse(board.getBlackPieces().get(Piece.PAWN).contains("d2"));
@@ -59,7 +59,7 @@ class TryCaptureTest {
         board.getWhitePieces().put(Piece.QUEEN, new HashSet<>(Set.of("d1")));
         board.getBlackPieces().put(Piece.ROOK, new HashSet<>(Set.of("d8")));
 
-        tryMove.invoke(game, true, true, "Qxd8");
+        tryCapture.invoke(game, true, "Qxd8");
 
         assertTrue(board.getWhitePieces().get(Piece.QUEEN).contains("d8"));
         assertFalse(board.getBlackPieces().get(Piece.ROOK).contains("d8"));
@@ -74,7 +74,7 @@ class TryCaptureTest {
         board.getWhitePieces().put(Piece.ROOK, new HashSet<>(Set.of("h1")));
         board.getBlackPieces().put(Piece.KNIGHT, new HashSet<>(Set.of("h8")));
 
-        tryMove.invoke(game, true, true, "Rxh8");
+        tryCapture.invoke(game, true, "Rxh8");
 
         assertTrue(board.getWhitePieces().get(Piece.ROOK).contains("h8"));
         assertFalse(board.getBlackPieces().get(Piece.KNIGHT).contains("h8"));
@@ -89,7 +89,7 @@ class TryCaptureTest {
         board.getWhitePieces().put(Piece.BISHOP, new HashSet<>(Set.of("c1")));
         board.getBlackPieces().put(Piece.KNIGHT, new HashSet<>(Set.of("f4")));
 
-        tryMove.invoke(game, true, true, "Bxf4");
+        tryCapture.invoke(game, true, "Bxf4");
 
         assertTrue(board.getWhitePieces().get(Piece.BISHOP).contains("f4"));
         assertFalse(board.getBlackPieces().get(Piece.KNIGHT).contains("f4"));
@@ -104,7 +104,7 @@ class TryCaptureTest {
         board.getWhitePieces().put(Piece.KNIGHT, new HashSet<>(Set.of("g1")));
         board.getBlackPieces().put(Piece.BISHOP, new HashSet<>(Set.of("e2")));
 
-        tryMove.invoke(game, true, true, "Nxe2");
+        tryCapture.invoke(game, true, "Nxe2");
 
         assertTrue(board.getWhitePieces().get(Piece.KNIGHT).contains("e2"));
         assertFalse(board.getBlackPieces().get(Piece.BISHOP).contains("e2"));
@@ -120,12 +120,12 @@ class TryCaptureTest {
         board.getWhitePieces().put(Piece.ROOK, new HashSet<>(Set.of("a1", "h1")));
         board.getBlackPieces().put(Piece.KNIGHT, new HashSet<>(Set.of("a8", "h8")));
 
-        tryMove.invoke(game, true, true, "R1xa8");
+        tryCapture.invoke(game, true, "R1xa8");
 
         assertTrue(board.getWhitePieces().get(Piece.ROOK).contains("a8"));
         assertFalse(board.getBlackPieces().get(Piece.KNIGHT).contains("a8"));
 
-        tryMove.invoke(game, true, true, "R1xh8");
+        tryCapture.invoke(game, true, "R1xh8");
 
         assertTrue(board.getWhitePieces().get(Piece.ROOK).contains("h8"));
         assertFalse(board.getBlackPieces().get(Piece.KNIGHT).contains("h8"));
@@ -136,9 +136,7 @@ class TryCaptureTest {
         board.getWhitePieces().put(Piece.PAWN, new HashSet<>(Set.of("d5")));
         board.getBlackPieces().put(Piece.PAWN, new HashSet<>(Set.of("e7")));
 
-        tryMove.invoke(game, false, false, "e7e5");
-
-        tryMove.invoke(game, true, true, "dxe6");
+        tryCapture.invoke(game, true, "dxe6");
 
         assertTrue(board.getWhitePieces().get(Piece.PAWN).contains("e6"));
         assertFalse(board.getBlackPieces().get(Piece.PAWN).contains("e5"));

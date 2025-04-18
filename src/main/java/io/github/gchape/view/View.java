@@ -53,7 +53,7 @@ public enum View {
         root.getStyleClass().add("root-pane");
         topBar.getStyleClass().add("top-bar");
 
-        treeView.setPrefWidth(110);
+        treeView.setPrefWidth(112.5);
 
         BorderPane.setMargin(textArea, new Insets(0, 0, 0, 10));
     }

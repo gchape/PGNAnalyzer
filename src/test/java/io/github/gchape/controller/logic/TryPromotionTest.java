@@ -7,14 +7,27 @@ import io.github.gchape.model.entities.Piece;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class TryPromotionTest {
-    private Board board;
+    private Game game;
 
     @BeforeEach
     public void setup() {
-        board = new Board();
+        game = new Game(Map.of(), "");
+    }
+
+    private Board getBoardReflectively(Game game) {
+        try {
+            Field boardField = Game.class.getDeclaredField("board");
+            boardField.setAccessible(true);
+            return (Board) boardField.get(game);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException("Error accessing 'board' field reflectively", e);
+        }
     }
 
     /**
@@ -23,10 +36,11 @@ class TryPromotionTest {
      */
     @Test
     public void testValidWhitePromotion() {
+        Board board = getBoardReflectively(game);
         board.getWhitePieces().get(Piece.PAWN).add("a7");
 
         String move = "a8=Q";
-        board.tryPromotion(true, move);
+        game.tryPromotion(true, move);
 
         assertFalse(board.getWhitePieces().get(Piece.PAWN).contains("a7"));
         assertTrue(board.getWhitePieces().get(Piece.QUEEN).contains("a8"));
@@ -38,10 +52,11 @@ class TryPromotionTest {
      */
     @Test
     public void testValidBlackPromotion() {
+        Board board = getBoardReflectively(game);
         board.getBlackPieces().get(Piece.PAWN).add("a2");
         String move = "a1=Q";
 
-        board.tryPromotion(false, move);
+        game.tryPromotion(false, move);
 
         assertFalse(board.getBlackPieces().get(Piece.PAWN).contains("a2"));
         assertTrue(board.getBlackPieces().get(Piece.QUEEN).contains("a1"));
@@ -53,8 +68,9 @@ class TryPromotionTest {
      */
     @Test
     public void testInvalidWhitePromotionRank() {
+        Board board = getBoardReflectively(game);
         String move = "a7=Q";
-        assertThrows(InvalidPromotionException.class, () -> board.tryPromotion(true, move));
+        assertThrows(InvalidPromotionException.class, () -> game.tryPromotion(true, move));
     }
 
     /**
@@ -63,8 +79,9 @@ class TryPromotionTest {
      */
     @Test
     public void testInvalidBlackPromotionRank() {
+        Board board = getBoardReflectively(game);
         String move = "a2=Q";
-        assertThrows(InvalidPromotionException.class, () -> board.tryPromotion(false, move));
+        assertThrows(InvalidPromotionException.class, () -> game.tryPromotion(false, move));
     }
 
     /**
@@ -73,8 +90,9 @@ class TryPromotionTest {
      */
     @Test
     public void testNoPawnAtExpectedPosition() {
+        Board board = getBoardReflectively(game);
         String move = "a8=Q";
-        assertThrows(NoPieceFoundException.class, () -> board.tryPromotion(true, move));
+        assertThrows(NoPieceFoundException.class, () -> game.tryPromotion(true, move));
     }
 
     /**
@@ -83,7 +101,8 @@ class TryPromotionTest {
      */
     @Test
     public void testInvalidPromotionPiece() {
+        Board board = getBoardReflectively(game);
         String move = "a7=R";
-        assertThrows(InvalidPromotionException.class, () -> board.tryPromotion(true, move));
+        assertThrows(InvalidPromotionException.class, () -> game.tryPromotion(true, move));
     }
 }
