@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 class TryCaptureTest {
-
     private Game game;
     private Board board;
     private Method tryCapture;

@@ -68,7 +68,6 @@ class TryPromotionTest {
      */
     @Test
     public void testInvalidWhitePromotionRank() {
-        Board board = getBoardReflectively(game);
         String move = "a7=Q";
         assertThrows(InvalidPromotionException.class, () -> game.tryPromotion(true, move));
     }
@@ -79,7 +78,6 @@ class TryPromotionTest {
      */
     @Test
     public void testInvalidBlackPromotionRank() {
-        Board board = getBoardReflectively(game);
         String move = "a2=Q";
         assertThrows(InvalidPromotionException.class, () -> game.tryPromotion(false, move));
     }
@@ -90,7 +88,6 @@ class TryPromotionTest {
      */
     @Test
     public void testNoPawnAtExpectedPosition() {
-        Board board = getBoardReflectively(game);
         String move = "a8=Q";
         assertThrows(NoPieceFoundException.class, () -> game.tryPromotion(true, move));
     }
@@ -101,7 +98,6 @@ class TryPromotionTest {
      */
     @Test
     public void testInvalidPromotionPiece() {
-        Board board = getBoardReflectively(game);
         String move = "a7=R";
         assertThrows(InvalidPromotionException.class, () -> game.tryPromotion(true, move));
     }
