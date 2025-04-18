@@ -3,7 +3,7 @@ package io.github.gchape.model.entities;
 public enum Piece {
     KING, QUEEN, ROOK, BISHOP, KNIGHT, PAWN;
 
-    public static Piece of(char symbol) {
+    public static Piece of(final char symbol) {
         return switch (symbol) {
             case 'Q' -> QUEEN;
             case 'K' -> KING;

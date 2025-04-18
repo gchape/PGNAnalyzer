@@ -16,7 +16,7 @@ public class Parser {
     private final List<String> moves;
     private final List<Map<String, String>> headers;
 
-    public Parser(File file) {
+    public Parser(final File file) {
         this.file = file;
         moves = new ArrayList<>();
         headers = new ArrayList<>();
@@ -34,7 +34,7 @@ public class Parser {
         parseGameHeaders(headers);
     }
 
-    private void parseGameHeaders(List<StringBuilder> headers) {
+    private void parseGameHeaders(final List<StringBuilder> headers) {
         Pattern pattern = Pattern.compile("\\[(\\w+)\\s+\"([^\"]*)\"]");
 
         for (StringBuilder header : headers) {
@@ -49,8 +49,8 @@ public class Parser {
         }
     }
 
-    private void parseGameMoves(List<StringBuilder> moves) {
-        for (StringBuilder move : moves) {
+    private void parseGameMoves(final List<StringBuilder> moves) {
+        for (final var move : moves) {
             var __ = move.toString();
             __ = COMMENT_PATTERN.matcher(__).replaceAll("");
             __ = MOVE_NUMBERS_PATTERN.matcher(__).replaceAll("");
@@ -61,8 +61,8 @@ public class Parser {
         }
     }
 
-    private void readLines(File file, StringBuilder header, StringBuilder body,
-                           List<StringBuilder> headers, List<StringBuilder> moves) {
+    private void readLines(final File file, final StringBuilder header, final StringBuilder body,
+                           final List<StringBuilder> headers, final List<StringBuilder> moves) {
         try {
             Files.readAllLines(file.toPath()).forEach(line -> {
                 if (line.contains("[")) {

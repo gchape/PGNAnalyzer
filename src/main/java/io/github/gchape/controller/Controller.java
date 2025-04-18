@@ -33,7 +33,7 @@ public enum Controller {
         return view.getRoot();
     }
 
-    private void updateFileTree(ObservableList<File> newFiles) {
+    private void updateFileTree(final ObservableList<File> newFiles) {
         var fileTree = model.getFileTree();
 
         if (!newFiles.isEmpty()) {
@@ -44,7 +44,7 @@ public enum Controller {
         }
     }
 
-    private void selectFilesClickAction(MouseEvent mouseEvent) {
+    private void selectFilesClickAction(final MouseEvent mouseEvent) {
         var stage = ((Node) mouseEvent.getSource()).getScene().getWindow();
         var selectedFiles = new FileChooser().showOpenDialog(stage);
 
@@ -55,7 +55,7 @@ public enum Controller {
         }
     }
 
-    private void analyzeClickAction(MouseEvent mouseEvent) {
+    private void analyzeClickAction(final MouseEvent mouseEvent) {
         model.selectFilesButtonDisabledProperty().set(true);
 
         var file = model.getSelectedFiles().getFirst();

@@ -8,13 +8,30 @@ import io.github.gchape.model.entities.Piece;
 import io.github.gchape.model.entities.Printer;
 import io.github.gchape.model.entities.Square;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Game implements Runnable {
-    private final static AtomicInteger id = new AtomicInteger(0);
+    private final static Logger logger;
+    private final static AtomicInteger id;
+
+    static {
+        id = new AtomicInteger(0);
+
+        logger = Logger.getLogger("io.gchape.github");
+        logger.setUseParentHandlers(false);
+        try {
+            logger.addHandler(new FileHandler("src/main/resources/errors.bad"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private final Board board;
     private final String moves;
@@ -54,10 +71,11 @@ public class Game implements Runnable {
                     tryPromotion(isWhite, move);
                 } else tryMove(isWhite, move);
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             isValid = false;
 
-            throw new RuntimeException(e);
+            System.err.println(e.getMessage());
+            logger.log(Level.WARNING, () -> String.valueOf(e));
         } finally {
             Printer.INSTANCE.appendBody(id.incrementAndGet(), isValid);
         }
