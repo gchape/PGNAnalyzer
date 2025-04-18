@@ -63,6 +63,13 @@ public class Game implements Runnable {
         }
     }
 
+    /**
+     * Attempts to capture a piece during a move. If the move is a capture, it removes the captured piece
+     * from the opponent's set of pieces and updates the current player's pieces.
+     *
+     * @param isWhite A boolean indicating whether the current player is white.
+     * @param move    A string representing the move (e.g., "Nxe5").
+     */
     private void tryCapture(final boolean isWhite, final String move) {
         var currentPieces = isWhite ? board.getWhitePieces() : board.getBlackPieces();
         var opponentPieces = isWhite ? board.getBlackPieces() : board.getWhitePieces();
@@ -89,6 +96,12 @@ public class Game implements Runnable {
         }
     }
 
+    /**
+     * Checks if a piece involved in a move is part of castling. If the piece is a king or rook,
+     * it marks it as having moved to prevent castling in future moves.
+     *
+     * @param startSquare The starting square of the piece that is moving.
+     */
     private void checkIfCastlePieceMoved(final Square startSquare) {
         var squares = Set.of("a1", "e1", "h1", "a8", "e8", "h8");
 
@@ -97,6 +110,12 @@ public class Game implements Runnable {
         }
     }
 
+    /**
+     * Attempts to move a piece on the board. If the move is valid, it updates the piece's position.
+     *
+     * @param isWhite A boolean indicating whether the current player is white.
+     * @param move    A string representing the move (e.g., "Nf3").
+     */
     private void tryMove(final boolean isWhite, final String move) {
         var piece = Piece.of(move.charAt(0));
         var currentPieces = isWhite ? board.getWhitePieces() : board.getBlackPieces();
@@ -112,6 +131,13 @@ public class Game implements Runnable {
         lastDoubleStepPawnSquare = Math.abs(targetSquare.y() - startSquare.y()) == 2 ? targetSquare : null;
     }
 
+    /**
+     * Attempts to perform both a capture and a promotion in a single move (e.g., "bxa1=Q").
+     * It first performs the capture, then promotes the pawn to the specified piece.
+     *
+     * @param isWhite A boolean indicating whether the current player is white.
+     * @param move    A string representing the move (e.g., "bxa1=Q").
+     */
     private void tryCaptureAndPromotion(final boolean isWhite, final String move) {
         final int i = move.indexOf('x'); // bxa1=Q
         final int j = move.indexOf('=');
@@ -125,6 +151,16 @@ public class Game implements Runnable {
         currentPieces.get(Piece.of(move.charAt(j + 1))).add(pawnSquare);
     }
 
+    /**
+     * Captures a piece by removing it from the target player's set of pieces and adding the captured
+     * piece's position to the attacking player's set of pieces.
+     *
+     * @param startPieces  The set of pieces of the attacking player.
+     * @param targetPieces The set of pieces of the defending player.
+     * @param startSquare  The starting square of the piece being captured.
+     * @param targetSquare The target square of the capture.
+     * @param piece        The type of piece performing the capture.
+     */
     private void capturePiece(final Map<Piece, Set<String>> startPieces, final Map<Piece, Set<String>> targetPieces,
                               final Square startSquare, final Square targetSquare, final Piece piece) {
         startPieces.get(piece).remove(startSquare.toChessNotation());
@@ -133,6 +169,15 @@ public class Game implements Runnable {
         targetPieces.values().forEach(squares -> squares.remove(targetSquare.toChessNotation()));
     }
 
+    /**
+     * Checks if a pawn move qualifies as an "en passant" capture, where a pawn captures an opponent's
+     * pawn that has just moved two squares forward from its starting position.
+     *
+     * @param startSquare  The starting square of the pawn making the move.
+     * @param targetSquare The target square where the pawn is moving.
+     * @param isWhite      A boolean indicating whether the current player is white.
+     * @return True if the move is an en passant capture, false otherwise.
+     */
     private boolean isEnPassant(final Square startSquare, final Square targetSquare, final boolean isWhite) {
         final int dx = targetSquare.x() - startSquare.x();
         final int dy = targetSquare.y() - startSquare.y();

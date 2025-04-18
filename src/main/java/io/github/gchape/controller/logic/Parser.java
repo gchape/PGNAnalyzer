@@ -7,14 +7,14 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class Parser {
-    private final File file;
-    private final List<String> moves;
-    private final List<Map<String, String>> headers;
-
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
     private static final Pattern ANNOTATIONS_PATTERN = Pattern.compile("[+#?!]");
     private static final Pattern MOVE_NUMBERS_PATTERN = Pattern.compile("\\d+\\.");
     private static final Pattern COMMENT_PATTERN = Pattern.compile(";.*|\\{[^}]*}");
+
+    private final File file;
+    private final List<String> moves;
+    private final List<Map<String, String>> headers;
 
     public Parser(File file) {
         this.file = file;

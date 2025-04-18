@@ -1,7 +1,5 @@
 package io.github.gchape.model.entities;
 
-import io.github.gchape.exceptions.InvalidCastlingException;
-import io.github.gchape.exceptions.InvalidPromotionException;
 import io.github.gchape.exceptions.NoPieceFoundException;
 
 import java.util.EnumMap;
